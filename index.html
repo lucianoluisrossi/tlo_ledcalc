@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#FF5722">
+    <meta name="description" content="Calculá la configuración ideal de pantallas LED para tu evento. Pitch, resolución, módulos, peso y consumo eléctrico al instante.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LED Calc">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Calculadora LED - TLO Visual">
+    <meta property="og:description" content="Calculá la configuración ideal de pantallas LED para tu evento">
+    <meta property="og:type" content="website">
+
+    <title>Calculadora LED - TLO Visual</title>
+
+    <link rel="manifest" href="./manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-black: #0A0A0A;
+            --primary-orange: #FF5722;
+            --dark-gray: #1E1E1E;
+            --medium-gray: #424242;
+            --light-gray: #E0E0E0;
+            --white: #FFFFFF;
+            --success: #4CAF50;
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1b1b 100%);
+            color: var(--white);
+            padding: 2rem;
+            padding-top: calc(2rem + var(--safe-top));
+            padding-bottom: calc(2rem + var(--safe-bottom));
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* ── PWA Banners ─────────────────────────────────────────── */
+
+        #offline-banner {
+            display: none;
+            position: fixed;
+            top: var(--safe-top);
+            left: 0;
+            right: 0;
+            background: #b71c1c;
+            color: white;
+            text-align: center;
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            z-index: 9999;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #offline-banner.visible { display: block; }
+
+        #install-banner {
+            display: none;
+            position: fixed;
+            bottom: calc(1rem + var(--safe-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark-gray);
+            border: 2px solid var(--primary-orange);
+            border-radius: 14px;
+            padding: 1rem 1.5rem;
+            width: min(420px, calc(100vw - 2rem));
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 9998;
+            font-family: 'Inter', sans-serif;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        #install-banner.visible { display: block; }
+
+        .install-banner-inner {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .install-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .install-text { flex: 1; }
+
+        .install-text strong {
+            display: block;
+            color: var(--white);
+            font-size: 0.95rem;
+        }
+
+        .install-text span {
+            font-size: 0.8rem;
+            color: var(--medium-gray);
+        }
+
+        .install-actions {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.8rem;
+        }
+
+        .btn-install {
+            flex: 1;
+            background: var(--primary-orange);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: opacity 0.2s;
+        }
+
+        .btn-install:hover { opacity: 0.85; }
+
+        .btn-dismiss {
+            background: transparent;
+            color: var(--medium-gray);
+            border: 1px solid var(--medium-gray);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: color 0.2s;
+        }
+
+        .btn-dismiss:hover { color: var(--white); }
+
+        /* ── Main Layout ──────────────────────────────────────────── */
+
+        .calculator-container {
+            max-width: 1200px;
+            width: 100%;
+            background: var(--dark-gray);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .calculator-header {
+            background: linear-gradient(135deg, var(--primary-orange), #FF8A50);
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .calculator-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .calculator-header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .calculator-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            padding: 3rem;
+        }
+
+        .inputs-section,
+        .results-section {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-orange);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: var(--light-gray);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-group input,
+        .input-group select {
+            background: var(--primary-black);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Roboto Mono', monospace;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .input-group select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23FF5722' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.2);
+        }
+
+        .input-with-unit {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .input-with-unit input { flex: 1; }
+
+        .unit {
+            background: rgba(255, 87, 34, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            color: var(--primary-orange);
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, var(--primary-orange), #FF8A50);
+            color: var(--white);
+            padding: 1.2rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 87, 34, 0.4);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        /* ── Result Cards ─────────────────────────────────────────── */
+
+        .result-card {
+            background: var(--primary-black);
+            border: 2px solid rgba(255, 87, 34, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .result-card:hover {
+            border-color: var(--primary-orange);
+            transform: translateX(5px);
+        }
+
+        .result-card h3 {
+            font-size: 1rem;
+            color: var(--light-gray);
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-orange);
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .result-detail {
+            font-size: 0.9rem;
+            color: var(--medium-gray);
+            margin-top: 0.5rem;
+        }
+
+        /* ── Recommendations ──────────────────────────────────────── */
+
+        .recommendation-box {
+            background: linear-gradient(135deg, rgba(255, 87, 34, 0.1), rgba(255, 138, 80, 0.1));
+            border: 2px solid var(--primary-orange);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .recommendation-box h3 {
+            color: var(--primary-orange);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .recommendation-box ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .recommendation-box li {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--light-gray);
+        }
+
+        .check-icon {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        /* ── Visual Preview ───────────────────────────────────────── */
+
+        .visual-preview {
+            background: var(--primary-black);
+            border-radius: 12px;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+
+        .screen-visualization {
+            border: 3px solid var(--primary-orange);
+            background: rgba(255, 87, 34, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Roboto Mono', monospace;
+            color: var(--primary-orange);
+            font-weight: 600;
+            transition: all 0.5s ease;
+        }
+
+        .dimension-label {
+            position: absolute;
+            background: var(--primary-orange);
+            color: var(--white);
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .dimension-width {
+            bottom: -1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .dimension-height {
+            right: -3rem;
+            top: 50%;
+            transform: translateY(-50%) rotate(90deg);
+        }
+
+        .info-tooltip {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background: rgba(255, 87, 34, 0.3);
+            color: var(--primary-orange);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 18px;
+            font-size: 0.75rem;
+            cursor: help;
+            font-weight: 700;
+        }
+
+        /* ── CTA ──────────────────────────────────────────────────── */
+
+        .cta-section {
+            background: var(--primary-black);
+            padding: 2rem;
+            text-align: center;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .cta-section p {
+            color: var(--light-gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .contact-btn {
+            background: transparent;
+            border: 2px solid var(--primary-orange);
+            color: var(--primary-orange);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .contact-btn:hover {
+            background: var(--primary-orange);
+            color: var(--white);
+        }
+
+        /* ── Animations ───────────────────────────────────────────── */
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Responsive ───────────────────────────────────────────── */
+
+        @media (max-width: 968px) {
+            body { padding: 1rem; padding-bottom: calc(6rem + var(--safe-bottom)); }
+
+            .calculator-body {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 1.5rem;
+            }
+
+            .calculator-header { padding: 2rem 1.5rem; }
+            .calculator-header h1 { font-size: 1.8rem; }
+
+            .result-value { font-size: 1.5rem; }
+
+            .dimension-height {
+                right: -2.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calculator-header h1 { font-size: 1.5rem; }
+            .calculate-btn { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Offline Banner -->
+<div id="offline-banner">⚡ Sin conexión — la calculadora funciona igual offline</div>
+
+<!-- Install Banner -->
+<div id="install-banner">
+    <div class="install-banner-inner">
+        <div class="install-icon">📱</div>
+        <div class="install-text">
+            <strong>Instalá la app</strong>
+            <span>Accedé a la calculadora sin internet, como una app nativa</span>
+        </div>
+    </div>
+    <div class="install-actions">
+        <button class="btn-install" id="btn-install">Instalar gratis</button>
+        <button class="btn-dismiss" id="btn-dismiss">Ahora no</button>
+    </div>
+</div>
+
+<div class="calculator-container">
+
+    <!-- HEADER -->
+    <div class="calculator-header">
+        <h1>🖥️ Calculadora de Pantallas LED</h1>
+        <p>Calculá la configuración ideal para tu evento en segundos</p>
+    </div>
+
+    <!-- BODY -->
+    <div class="calculator-body">
+
+        <!-- INPUTS -->
+        <div class="inputs-section">
+            <h2 class="section-title">Datos de tu Proyecto</h2>
+
+            <div class="input-group">
+                <label>
+                    Ancho deseado de la pantalla
+                    <span class="info-tooltip" title="Ancho aproximado que necesitas">?</span>
+                </label>
+                <div class="input-with-unit">
+                    <input type="number" id="width" placeholder="Ej: 10" step="0.5" min="1" value="10" inputmode="decimal">
+                    <span class="unit">metros</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>
+                    Alto deseado de la pantalla
+                    <span class="info-tooltip" title="Alto aproximado que necesitas">?</span>
+                </label>
+                <div class="input-with-unit">
+                    <input type="number" id="height" placeholder="Ej: 6" step="0.5" min="1" value="6" inputmode="decimal">
+                    <span class="unit">metros</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>
+                    Distancia mínima de visualización
+                    <span class="info-tooltip" title="¿A qué distancia estará el público más cercano?">?</span>
+                </label>
+                <div class="input-with-unit">
+                    <input type="number" id="distance" placeholder="Ej: 15" step="1" min="1" value="15" inputmode="decimal">
+                    <span class="unit">metros</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Tipo de evento</label>
+                <select id="eventType">
+                    <option value="indoor">Indoor (Interior)</option>
+                    <option value="outdoor" selected>Outdoor (Exterior)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Uso</label>
+                <select id="useType">
+                    <option value="rental">Alquiler / Evento temporal</option>
+                    <option value="fixed">Instalación fija</option>
+                </select>
+            </div>
+
+            <button class="calculate-btn" onclick="calculate()">🧮 Calcular Configuración</button>
+        </div>
+
+        <!-- RESULTS -->
+        <div class="results-section">
+            <h2 class="section-title">Resultados</h2>
+
+            <div class="visual-preview" id="visualPreview">
+                <div class="screen-visualization" id="screenViz" style="width: 200px; height: 120px;">
+                    10m × 6m
+                </div>
+                <span class="dimension-label dimension-width">10.00m</span>
+                <span class="dimension-label dimension-height">6.00m</span>
+            </div>
+
+            <div class="result-card">
+                <h3>💎 Pitch Recomendado</h3>
+                <div class="result-value" id="pitchResult">P4.8</div>
+                <div class="result-detail">Ideal para esta distancia de visualización</div>
+            </div>
+
+            <div class="result-card">
+                <h3>📐 Resolución Final</h3>
+                <div class="result-value" id="resolutionResult">2083 × 1250 px</div>
+                <div class="result-detail">Pixeles horizontales × verticales</div>
+            </div>
+
+            <div class="result-card">
+                <h3>🧩 Módulos Necesarios</h3>
+                <div class="result-value" id="modulesResult">20 × 12 = 240</div>
+                <div class="result-detail">Cantidad total de paneles (500×500mm)</div>
+            </div>
+
+            <div class="result-card">
+                <h3>⚖️ Peso Aproximado</h3>
+                <div class="result-value" id="weightResult">960 kg</div>
+                <div class="result-detail">Peso total de la configuración</div>
+            </div>
+
+            <div class="result-card">
+                <h3>⚡ Consumo Eléctrico</h3>
+                <div class="result-value" id="powerResult">12 kW</div>
+                <div class="result-detail">Consumo máximo estimado</div>
+            </div>
+
+            <div class="recommendation-box">
+                <h3>✨ Recomendaciones</h3>
+                <ul id="recommendations">
+                    <li><span class="check-icon">✓</span> Pantalla P4.8 Outdoor es ideal para esta distancia</li>
+                    <li><span class="check-icon">✓</span> Excelente para conciertos y eventos grandes</li>
+                    <li><span class="check-icon">✓</span> Requiere estructura de soporte tipo truss</li>
+                    <li><span class="check-icon">✓</span> Se puede montar en 4-6 horas con equipo técnico</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+        <p>¿Te interesa esta configuración? Consultanos para recibir un presupuesto personalizado</p>
+        <div class="cta-buttons">
+            <a href="https://wa.me/34686514064" class="contact-btn" target="_blank" rel="noopener">📱 Consultar por WhatsApp</a>
+            <a href="mailto:info@tlovisual.com" class="contact-btn">📧 Enviar Email</a>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ── Screen specs ────────────────────────────────────────────────
+    const screens = {
+        indoor: {
+            p2_5: { pitch: 2.5, moduleSize: 0.5, weight: 8,   power: 800 },
+            p3:   { pitch: 3.0, moduleSize: 0.5, weight: 7.5, power: 700 },
+            p3_9: { pitch: 3.9, moduleSize: 0.5, weight: 7,   power: 650 }
+        },
+        outdoor: {
+            p4:   { pitch: 4.0, moduleSize: 0.5, weight: 9,   power: 850 },
+            p4_8: { pitch: 4.8, moduleSize: 0.5, weight: 8.5, power: 800 },
+            p5:   { pitch: 5.0, moduleSize: 0.5, weight: 8,   power: 750 },
+            p6:   { pitch: 6.0, moduleSize: 0.5, weight: 7.5, power: 700 }
+        }
+    };
+
+    function calculate() {
+        const width     = parseFloat(document.getElementById('width').value);
+        const height    = parseFloat(document.getElementById('height').value);
+        const distance  = parseFloat(document.getElementById('distance').value);
+        const eventType = document.getElementById('eventType').value;
+
+        if (!width || !height || !distance) {
+            alert('Por favor completá todos los campos');
+            return;
+        }
+
+        const optimalPitchMin = distance * 0.25;
+        const optimalPitchMax = distance * 0.35;
+
+        const availableScreens = screens[eventType];
+        let selectedScreen = null;
+        let selectedPitchName = '';
+
+        for (const [name, spec] of Object.entries(availableScreens)) {
+            if (spec.pitch >= optimalPitchMin && spec.pitch <= optimalPitchMax) {
+                selectedScreen = spec;
+                selectedPitchName = name.toUpperCase().replace('_', '.');
+                break;
+            }
+        }
+
+        if (!selectedScreen) {
+            const pitches = Object.entries(availableScreens);
+            const closest = pitches.reduce((prev, curr) => {
+                const prevDiff = Math.abs(prev[1].pitch - optimalPitchMin);
+                const currDiff = Math.abs(curr[1].pitch - optimalPitchMin);
+                return currDiff < prevDiff ? curr : prev;
+            });
+            selectedScreen = closest[1];
+            selectedPitchName = closest[0].toUpperCase().replace('_', '.');
+        }
+
+        const moduleSize = selectedScreen.moduleSize;
+        const modulesX   = Math.ceil(width  / moduleSize);
+        const modulesY   = Math.ceil(height / moduleSize);
+        const totalModules = modulesX * modulesY;
+
+        const finalWidth  = (modulesX * moduleSize).toFixed(2);
+        const finalHeight = (modulesY * moduleSize).toFixed(2);
+
+        const pixelDensity = 1000 / selectedScreen.pitch;
+        const resolutionX  = Math.round(finalWidth  * pixelDensity);
+        const resolutionY  = Math.round(finalHeight * pixelDensity);
+
+        const totalWeight = Math.round(totalModules * selectedScreen.weight);
+        const totalPower  = (totalModules * selectedScreen.power / 1000).toFixed(1);
+
+        document.getElementById('pitchResult').textContent      = selectedPitchName;
+        document.getElementById('resolutionResult').textContent = `${resolutionX} × ${resolutionY} px`;
+        document.getElementById('modulesResult').textContent    = `${modulesX} × ${modulesY} = ${totalModules}`;
+        document.getElementById('weightResult').textContent     = `${totalWeight} kg`;
+        document.getElementById('powerResult').textContent      = `${totalPower} kW`;
+
+        updateVisualization(finalWidth, finalHeight);
+        document.querySelector('.dimension-width').textContent  = `${finalWidth}m`;
+        document.querySelector('.dimension-height').textContent = `${finalHeight}m`;
+
+        updateRecommendations(selectedPitchName, distance, eventType, totalModules);
+    }
+
+    function updateVisualization(width, height) {
+        const viz = document.getElementById('screenViz');
+        const ratio = width / height;
+        let displayWidth, displayHeight;
+
+        if (ratio > 1.67) {
+            displayWidth  = 300;
+            displayHeight = 300 / ratio;
+        } else {
+            displayHeight = 180;
+            displayWidth  = 180 * ratio;
+        }
+
+        viz.style.width  = displayWidth  + 'px';
+        viz.style.height = displayHeight + 'px';
+        viz.textContent  = `${width}m × ${height}m`;
+    }
+
+    function updateRecommendations(pitch, distance, eventType, modules) {
+        const recs = [];
+
+        recs.push(`Pantalla ${pitch} ${eventType === 'outdoor' ? 'Outdoor' : 'Indoor'} es ideal para esta distancia`);
+
+        if (distance < 5)       recs.push('Excelente definición para eventos corporativos y presentaciones');
+        else if (distance < 15) recs.push('Perfecta para conciertos medianos y eventos sociales');
+        else                    recs.push('Ideal para conciertos grandes y festivales al aire libre');
+
+        if (modules < 100)      recs.push('Configuración ligera, montaje rápido (2-3 horas)');
+        else if (modules < 200) recs.push('Requiere estructura de soporte tipo truss o ground support');
+        else                    recs.push('Requiere estructura reforzada y equipo técnico especializado');
+
+        if (eventType === 'outdoor') recs.push('Recomendamos sistema de protección contra lluvia (IP65)');
+        else                         recs.push('Sistema con control de brillo automático para interiores');
+
+        document.getElementById('recommendations').innerHTML =
+            recs.map(r => `<li><span class="check-icon">✓</span> ${r}</li>`).join('');
+    }
+
+    // Auto-recalculate on input change
+    ['width', 'height', 'distance', 'eventType', 'useType'].forEach(id => {
+        document.getElementById(id).addEventListener('change', calculate);
+        document.getElementById(id).addEventListener('input', calculate);
+    });
+
+    // Run on load
+    window.addEventListener('load', calculate);
+
+    // ── PWA: Service Worker ─────────────────────────────────────────
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(err => {
+                console.warn('SW registration failed:', err);
+            });
+        });
+    }
+
+    // ── PWA: Offline Banner ─────────────────────────────────────────
+    const offlineBanner = document.getElementById('offline-banner');
+
+    function updateOnlineStatus() {
+        offlineBanner.classList.toggle('visible', !navigator.onLine);
+    }
+
+    window.addEventListener('online',  updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+
+    // ── PWA: Install Prompt ─────────────────────────────────────────
+    let deferredPrompt = null;
+    const installBanner  = document.getElementById('install-banner');
+    const btnInstall     = document.getElementById('btn-install');
+    const btnDismiss     = document.getElementById('btn-dismiss');
+
+    window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferredPrompt = e;
+
+        // Only show if user hasn't dismissed before
+        if (!localStorage.getItem('pwa-dismissed')) {
+            setTimeout(() => installBanner.classList.add('visible'), 2000);
+        }
+    });
+
+    btnInstall.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        installBanner.classList.remove('visible');
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+    });
+
+    btnDismiss.addEventListener('click', () => {
+        installBanner.classList.remove('visible');
+        localStorage.setItem('pwa-dismissed', '1');
+    });
+
+    window.addEventListener('appinstalled', () => {
+        installBanner.classList.remove('visible');
+        deferredPrompt = null;
+    });
+</script>
+
+</body>
+</html>
