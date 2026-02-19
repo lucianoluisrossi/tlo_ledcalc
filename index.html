@@ -1,983 +1,508 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#FF5722">
-    <meta name="description" content="Calculá la configuración ideal de pantallas LED para tu evento. Pitch, resolución, módulos, peso y consumo eléctrico al instante.">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="LED Calc">
-    <meta name="mobile-web-app-capable" content="yes">
-
-    <!-- Open Graph -->
-    <meta property="og:title" content="Calculadora LED - TLO Visual">
-    <meta property="og:description" content="Calculá la configuración ideal de pantallas LED para tu evento">
-    <meta property="og:type" content="website">
-
-    <title>Calculadora LED - TLO Visual</title>
-
-    <link rel="manifest" href="./manifest.json">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-black: #0A0A0A;
-            --primary-orange: #FF5722;
-            --dark-gray: #1E1E1E;
-            --medium-gray: #424242;
-            --light-gray: #E0E0E0;
-            --white: #FFFFFF;
-            --success: #4CAF50;
-            --safe-top: env(safe-area-inset-top, 0px);
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d1b1b 100%);
-            color: var(--white);
-            padding: 2rem;
-            padding-top: calc(2rem + var(--safe-top));
-            padding-bottom: calc(2rem + var(--safe-bottom));
-            min-height: 100vh;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            /* Prevent horizontal overflow on mobile */
-            overflow-x: hidden;
-            width: 100%;
-        }
-
-        h1, h2, h3 {
-            font-family: 'Poppins', sans-serif;
-        }
-
-        /* ── PWA Banners ─────────────────────────────────────────── */
-
-        #offline-banner {
-            display: none;
-            position: fixed;
-            top: var(--safe-top);
-            left: 0;
-            right: 0;
-            background: #b71c1c;
-            color: white;
-            text-align: center;
-            padding: 0.6rem 1rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            z-index: 9999;
-            font-family: 'Inter', sans-serif;
-        }
-
-        #offline-banner.visible { display: block; }
-
-        #install-banner {
-            display: none;
-            position: fixed;
-            bottom: calc(1rem + var(--safe-bottom));
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--dark-gray);
-            border: 2px solid var(--primary-orange);
-            border-radius: 14px;
-            padding: 1rem 1.5rem;
-            width: min(420px, calc(100vw - 2rem));
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            z-index: 9998;
-            font-family: 'Inter', sans-serif;
-            animation: slideUp 0.4s ease;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-
-        #install-banner.visible { display: block; }
-
-        .install-banner-inner {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .install-icon {
-            font-size: 2rem;
-            flex-shrink: 0;
-        }
-
-        .install-text { flex: 1; }
-
-        .install-text strong {
-            display: block;
-            color: var(--white);
-            font-size: 0.95rem;
-        }
-
-        .install-text span {
-            font-size: 0.8rem;
-            color: var(--medium-gray);
-        }
-
-        .install-actions {
-            display: flex;
-            gap: 0.6rem;
-            margin-top: 0.8rem;
-        }
-
-        .btn-install {
-            flex: 1;
-            background: var(--primary-orange);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 0.6rem 1rem;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: opacity 0.2s;
-        }
-
-        .btn-install:hover { opacity: 0.85; }
-
-        .btn-dismiss {
-            background: transparent;
-            color: var(--medium-gray);
-            border: 1px solid var(--medium-gray);
-            border-radius: 8px;
-            padding: 0.6rem 1rem;
-            font-size: 0.85rem;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: color 0.2s;
-        }
-
-        .btn-dismiss:hover { color: var(--white); }
-
-        /* ── Main Layout ──────────────────────────────────────────── */
-
-        .calculator-container {
-            max-width: 1200px;
-            width: 100%;
-            min-width: 0;
-            background: var(--dark-gray);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
-
-        .calculator-header {
-            background: linear-gradient(135deg, var(--primary-orange), #FF8A50);
-            padding: 3rem;
-            text-align: center;
-        }
-
-        .header-logo {
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: center;
-        }
-
-        .logo-img {
-            height: 60px;
-            width: auto;
-            object-fit: contain;
-            background: rgba(255, 255, 255, 0.92);
-            padding: 0.5rem 1.2rem;
-            border-radius: 10px;
-        }
-
-        .calculator-header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .calculator-header p {
-            font-size: 1.1rem;
-            opacity: 0.95;
-        }
-
-        .calculator-body {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            padding: 3rem;
-        }
-
-        .inputs-section,
-        .results-section {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--primary-orange);
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .input-group label {
-            font-weight: 600;
-            color: var(--light-gray);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .input-group input,
-        .input-group select {
-            background: var(--primary-black);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            color: var(--white);
-            padding: 1rem;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-family: 'Roboto Mono', monospace;
-            transition: all 0.3s ease;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        .input-group select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23FF5722' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            padding-right: 2.5rem;
-        }
-
-        .input-group input:focus,
-        .input-group select:focus {
-            outline: none;
-            border-color: var(--primary-orange);
-            box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.2);
-        }
-
-        .input-with-unit {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .input-with-unit input { flex: 1; }
-
-        .unit {
-            background: rgba(255, 87, 34, 0.2);
-            padding: 1rem;
-            border-radius: 8px;
-            font-weight: 600;
-            color: var(--primary-orange);
-            min-width: 60px;
-            text-align: center;
-        }
-
-        .calculate-btn {
-            background: linear-gradient(135deg, var(--primary-orange), #FF8A50);
-            color: var(--white);
-            padding: 1.2rem 2rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 1rem;
-            font-family: 'Poppins', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .calculate-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(255, 87, 34, 0.4);
-        }
-
-        .calculate-btn:active {
-            transform: translateY(0);
-        }
-
-        /* ── Result Cards ─────────────────────────────────────────── */
-
-        .result-card {
-            background: var(--primary-black);
-            border: 2px solid rgba(255, 87, 34, 0.3);
-            border-radius: 12px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .result-card:hover {
-            border-color: var(--primary-orange);
-            transform: translateX(5px);
-        }
-
-        .result-card h3 {
-            font-size: 1rem;
-            color: var(--light-gray);
-            margin-bottom: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .result-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary-orange);
-            font-family: 'Roboto Mono', monospace;
-        }
-
-        .result-detail {
-            font-size: 0.9rem;
-            color: var(--medium-gray);
-            margin-top: 0.5rem;
-        }
-
-        /* ── Recommendations ──────────────────────────────────────── */
-
-        .recommendation-box {
-            background: linear-gradient(135deg, rgba(255, 87, 34, 0.1), rgba(255, 138, 80, 0.1));
-            border: 2px solid var(--primary-orange);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .recommendation-box h3 {
-            color: var(--primary-orange);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .recommendation-box ul {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-
-        .recommendation-box li {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--light-gray);
-        }
-
-        .check-icon {
-            color: var(--success);
-            font-weight: 700;
-        }
-
-        /* ── Visual Preview ───────────────────────────────────────── */
-
-        .visual-preview {
-            background: var(--primary-black);
-            border-radius: 12px;
-            padding: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 200px;
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            position: relative;
-        }
-
-        .screen-visualization {
-            border: 3px solid var(--primary-orange);
-            background: rgba(255, 87, 34, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Roboto Mono', monospace;
-            color: var(--primary-orange);
-            font-weight: 600;
-            transition: all 0.5s ease;
-        }
-
-        .dimension-label {
-            position: absolute;
-            background: var(--primary-orange);
-            color: var(--white);
-            padding: 0.3rem 0.8rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .dimension-width {
-            bottom: -1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .dimension-height {
-            right: -3rem;
-            top: 50%;
-            transform: translateY(-50%) rotate(90deg);
-        }
-
-        .info-tooltip {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            background: rgba(255, 87, 34, 0.3);
-            color: var(--primary-orange);
-            border-radius: 50%;
-            text-align: center;
-            line-height: 18px;
-            font-size: 0.75rem;
-            cursor: help;
-            font-weight: 700;
-        }
-
-        /* ── CTA ──────────────────────────────────────────────────── */
-
-        .cta-section {
-            background: var(--primary-black);
-            padding: 2rem;
-            text-align: center;
-            border-top: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .cta-logo {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 1.25rem;
-        }
-
-        .cta-logo-img {
-            height: 48px;
-            width: auto;
-            object-fit: contain;
-            opacity: 0.9;
-        }
-
-        .cta-section p {
-            color: var(--light-gray);
-            margin-bottom: 1.5rem;
-        }
-
-        .cta-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: center;
-        }
-
-        .contact-btn {
-            background: transparent;
-            border: 2px solid var(--primary-orange);
-            color: var(--primary-orange);
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .contact-btn:hover {
-            background: var(--primary-orange);
-            color: var(--white);
-        }
-
-        /* ── Animations ───────────────────────────────────────────── */
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ── Responsive ───────────────────────────────────────────── */
-
-        @media (max-width: 968px) {
-            body {
-                padding: 0.75rem;
-                padding-top: calc(0.75rem + var(--safe-top));
-                padding-bottom: calc(5rem + var(--safe-bottom));
-            }
-
-            .calculator-container {
-                border-radius: 14px;
-            }
-
-            .calculator-body {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-                padding: 1.25rem;
-            }
-
-            .calculator-header { padding: 1.75rem 1.25rem; }
-
-            .logo-img { height: 46px; padding: 0.4rem 1rem; }
-
-            .calculator-header h1 {
-                font-size: 1.6rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .calculator-header p {
-                font-size: 0.95rem;
-            }
-
-            .section-title {
-                font-size: 1.2rem;
-            }
-
-            .result-value {
-                font-size: 1.5rem;
-            }
-
-            /* Visual preview: dimension labels need more room */
-            .visual-preview {
-                padding: 2.5rem 1.5rem 2.5rem 1rem;
-                overflow: visible;
-            }
-
-            .dimension-height {
-                right: -2.8rem;
-            }
-
-            /* CTA buttons stack */
-            .cta-section {
-                padding: 1.5rem 1.25rem;
-            }
-
-            .contact-btn {
-                width: 100%;
-                text-align: center;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 0.5rem;
-                padding-top: calc(0.5rem + var(--safe-top));
-                padding-bottom: calc(5rem + var(--safe-bottom));
-            }
-
-            .calculator-container {
-                border-radius: 10px;
-            }
-
-            .calculator-header {
-                padding: 1.5rem 1rem;
-            }
-
-            .logo-img { height: 38px; padding: 0.35rem 0.9rem; }
-            .cta-logo-img { height: 36px; }
-
-            .calculator-header h1 {
-                font-size: 1.3rem;
-            }
-
-            .calculator-header p {
-                font-size: 0.85rem;
-            }
-
-            .calculator-body {
-                padding: 1rem;
-                gap: 1.25rem;
-            }
-
-            .input-group input,
-            .input-group select {
-                padding: 0.85rem;
-                font-size: 0.95rem;
-            }
-
-            .unit {
-                padding: 0.85rem 0.6rem;
-                min-width: 50px;
-                font-size: 0.85rem;
-            }
-
-            .result-card {
-                padding: 1.1rem;
-            }
-
-            .result-value {
-                font-size: 1.3rem;
-            }
-
-            .calculate-btn {
-                font-size: 0.95rem;
-                padding: 1rem 1.5rem;
-            }
-
-            /* Prevent dimension-height label from clipping off-screen */
-            .visual-preview {
-                padding: 2.5rem 3.5rem 2.5rem 1rem;
-            }
-
-            .dimension-height {
-                right: -2.5rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#FF5722">
+  <meta name="description" content="Calculá la configuración ideal de pantallas LED para tu evento.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LED Calc">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Calculadora LED - TLO Visual</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --black:#0A0A0A; --dark:#1E1E1E; --mid:#424242;
+      --light:#E0E0E0; --white:#FFFFFF;
+      --orange:#FF5722; --orange2:#FF8A50; --green:#4CAF50;
+    }
+    html, body { width: 100%; overflow-x: hidden; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d1b1b 100%);
+      color: var(--white);
+      min-height: 100vh;
+      padding: 1.5rem;
+      padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    h1, h2, h3 { font-family: 'Poppins', sans-serif; }
+
+    .app {
+      width: 100%;
+      max-width: 1100px;
+      background: var(--dark);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      padding: 2rem 1.5rem 1.5rem;
+      text-align: center;
+    }
+    .header-logo { display:flex; justify-content:center; margin-bottom:1rem; }
+    .header-logo img {
+      height: 52px; width: auto;
+      background: rgba(255,255,255,0.93);
+      padding: 0.45rem 1rem; border-radius: 8px;
+      object-fit: contain;
+    }
+    .header h1 { font-size: clamp(1.2rem, 4vw, 2rem); margin-bottom: 0.4rem; line-height: 1.2; }
+    .header p  { font-size: clamp(0.8rem, 2.5vw, 1rem); opacity: 0.95; }
+
+    /* Body grid */
+    .body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      padding: 2rem;
+    }
+    @media (max-width: 680px) {
+      .body { grid-template-columns: 1fr; gap: 1.5rem; padding: 1rem; }
+    }
+
+    .section { display: flex; flex-direction: column; gap: 1.25rem; }
+    .section-title {
+      font-size: clamp(1rem, 3vw, 1.3rem);
+      padding-bottom: 0.65rem;
+      border-bottom: 2px solid var(--orange);
+    }
+
+    /* Fields */
+    .field { display: flex; flex-direction: column; gap: 0.4rem; }
+    .field label {
+      font-weight: 600; font-size: 0.88rem;
+      color: var(--light); display: flex; align-items: center; gap: 0.4rem;
+    }
+    .tip {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:16px; height:16px;
+      background:rgba(255,87,34,0.25); color:var(--orange);
+      border-radius:50%; font-size:0.68rem; font-weight:700; cursor:help; flex-shrink:0;
+    }
+    .input-row { display:flex; gap:0.5rem; align-items:stretch; }
+    .input-row input { flex:1; min-width:0; }
+    .unit {
+      background:rgba(255,87,34,0.18); color:var(--orange);
+      font-weight:600; font-size:0.82rem;
+      padding:0 0.8rem; border-radius:8px;
+      display:flex; align-items:center; white-space:nowrap; flex-shrink:0;
+    }
+    input, select {
+      width:100%; background:var(--black);
+      border:2px solid rgba(255,255,255,0.1);
+      color:var(--white); padding:0.82rem 0.9rem;
+      border-radius:8px; font-size:1rem;
+      font-family:'Roboto Mono', monospace;
+      transition:border-color .25s, box-shadow .25s;
+      -webkit-appearance:none; appearance:none; min-width:0;
+    }
+    select {
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath stroke='%23FF5722' stroke-width='2' fill='none' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 0.9rem center; padding-right:2.4rem;
+    }
+    input:focus, select:focus {
+      outline:none; border-color:var(--orange);
+      box-shadow:0 0 0 3px rgba(255,87,34,0.2);
+    }
+    .calc-btn {
+      width:100%; background:linear-gradient(135deg, var(--orange), var(--orange2));
+      color:var(--white); border:none; border-radius:8px;
+      padding:1rem; font-size:1rem; font-weight:700;
+      font-family:'Poppins', sans-serif; cursor:pointer;
+      transition:transform .2s, box-shadow .2s; margin-top:0.5rem;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .calc-btn:hover  { transform:translateY(-2px); box-shadow:0 8px 24px rgba(255,87,34,0.4); }
+    .calc-btn:active { transform:translateY(0); }
+
+    /* Cards */
+    .card {
+      background:var(--black); border:2px solid rgba(255,87,34,0.25);
+      border-radius:10px; padding:1rem 1.2rem;
+      transition:border-color .25s, transform .25s;
+      animation:fadeUp .4s ease;
+    }
+    .card:hover { border-color:var(--orange); transform:translateX(4px); }
+    .card h3 { font-size:0.72rem; text-transform:uppercase; letter-spacing:1px; color:var(--light); margin-bottom:0.45rem; }
+    .card-value {
+      font-size:clamp(1.15rem, 3.5vw, 1.7rem);
+      font-weight:700; color:var(--orange);
+      font-family:'Roboto Mono', monospace; word-break:break-word;
+    }
+    .card-detail { font-size:0.78rem; color:var(--mid); margin-top:0.3rem; }
+
+    /* Preview */
+    .preview-wrap {
+      background:var(--black); border:2px dashed rgba(255,255,255,0.15);
+      border-radius:10px; padding:2rem 3.5rem 2.5rem 1.5rem;
+      display:flex; align-items:center; justify-content:center;
+      min-height:150px; position:relative; overflow:visible;
+    }
+    .screen-box {
+      border:3px solid var(--orange); background:rgba(255,87,34,0.1);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Roboto Mono',monospace; color:var(--orange);
+      font-weight:600; font-size:0.82rem;
+      transition:width .5s ease, height .5s ease;
+    }
+    .dim-label {
+      position:absolute; background:var(--orange); color:var(--white);
+      padding:0.22rem 0.55rem; border-radius:4px;
+      font-size:0.72rem; font-weight:600; white-space:nowrap;
+    }
+    .dim-w { bottom:0.5rem; left:50%; transform:translateX(-50%); }
+    .dim-h { right:0.5rem; top:50%; transform:translateY(-50%) rotate(90deg); }
+
+    /* Recs */
+    .recs {
+      background:linear-gradient(135deg, rgba(255,87,34,0.07), rgba(255,138,80,0.07));
+      border:2px solid var(--orange); border-radius:10px; padding:1.1rem;
+    }
+    .recs h3 { color:var(--orange); font-size:0.9rem; margin-bottom:0.65rem; display:flex; align-items:center; gap:0.4rem; }
+    .recs ul { list-style:none; display:flex; flex-direction:column; gap:0.55rem; }
+    .recs li { display:flex; align-items:flex-start; gap:0.45rem; font-size:0.87rem; color:var(--light); line-height:1.4; }
+    .recs li .check { color:var(--green); font-weight:700; flex-shrink:0; margin-top:1px; }
+
+    /* CTA */
+    .cta { background:var(--black); border-top:2px solid rgba(255,255,255,0.08); padding:1.5rem; text-align:center; }
+    .cta-logo { display:flex; justify-content:center; margin-bottom:1rem; }
+    .cta-logo img { height:42px; width:auto; object-fit:contain; opacity:0.9; }
+    .cta p { color:var(--light); font-size:0.92rem; margin-bottom:1.1rem; }
+    .cta-btns { display:flex; flex-wrap:wrap; gap:0.75rem; justify-content:center; }
+    .btn-cta {
+      background:transparent; border:2px solid var(--orange); color:var(--orange);
+      padding:0.8rem 1.4rem; border-radius:8px; font-weight:600; font-size:0.88rem;
+      text-decoration:none; display:inline-block;
+      transition:background .25s, color .25s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .btn-cta:hover { background:var(--orange); color:var(--white); }
+    @media (max-width:480px) { .btn-cta { width:100%; text-align:center; } }
+
+    /* PWA banners */
+    #offline-banner {
+      display:none; position:fixed; top:env(safe-area-inset-top,0); left:0; right:0;
+      background:#b71c1c; color:white; text-align:center;
+      padding:0.6rem 1rem; font-size:0.82rem; font-weight:600; z-index:9999;
+    }
+    #offline-banner.show { display:block; }
+    #install-banner {
+      display:none; position:fixed;
+      bottom:calc(1rem + env(safe-area-inset-bottom,0px));
+      left:50%; transform:translateX(-50%);
+      width:min(400px, calc(100vw - 2rem));
+      background:var(--dark); border:2px solid var(--orange);
+      border-radius:12px; padding:1rem 1.2rem;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5); z-index:9998;
+      animation:slideUp .35s ease;
+    }
+    #install-banner.show { display:block; }
+    .ib-row { display:flex; align-items:center; gap:0.75rem; }
+    .ib-icon { font-size:1.8rem; flex-shrink:0; }
+    .ib-text strong { display:block; font-size:0.88rem; }
+    .ib-text span { font-size:0.76rem; color:var(--mid); }
+    .ib-btns { display:flex; gap:0.5rem; margin-top:0.7rem; }
+    .ib-install {
+      flex:1; background:var(--orange); color:white; border:none;
+      border-radius:7px; padding:0.52rem 1rem; font-weight:600;
+      font-size:0.82rem; cursor:pointer; font-family:'Inter',sans-serif;
+    }
+    .ib-dismiss {
+      background:transparent; color:var(--mid); border:1px solid var(--mid);
+      border-radius:7px; padding:0.52rem 1rem; font-size:0.82rem;
+      cursor:pointer; font-family:'Inter',sans-serif;
+    }
+    .ib-dismiss:hover { color:var(--white); }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(12px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    @keyframes slideUp {
+      from { opacity:0; transform:translateX(-50%) translateY(16px); }
+      to   { opacity:1; transform:translateX(-50%) translateY(0); }
+    }
+  </style>
 </head>
 <body>
 
-<!-- Offline Banner -->
 <div id="offline-banner">⚡ Sin conexión — la calculadora funciona igual offline</div>
 
-<!-- Install Banner -->
 <div id="install-banner">
-    <div class="install-banner-inner">
-        <div class="install-icon">📱</div>
-        <div class="install-text">
-            <strong>Instalá la app</strong>
-            <span>Accedé a la calculadora sin internet, como una app nativa</span>
-        </div>
+  <div class="ib-row">
+    <div class="ib-icon">📱</div>
+    <div class="ib-text">
+      <strong>Instalá la app</strong>
+      <span>Funciona sin internet como app nativa</span>
     </div>
-    <div class="install-actions">
-        <button class="btn-install" id="btn-install">Instalar gratis</button>
-        <button class="btn-dismiss" id="btn-dismiss">Ahora no</button>
-    </div>
+  </div>
+  <div class="ib-btns">
+    <button class="ib-install" id="btn-install">Instalar gratis</button>
+    <button class="ib-dismiss" id="btn-dismiss">Ahora no</button>
+  </div>
 </div>
 
-<div class="calculator-container">
+<div class="app">
 
-    <!-- HEADER -->
-    <div class="calculator-header">
-        <div class="header-logo">
-            <img src="./tlo-logo.png" alt="TLO Visual" class="logo-img">
+  <div class="header">
+    <div class="header-logo">
+      <img src="./tlo-logo.png" alt="TLO Visual">
+    </div>
+    <h1>🖥️ Calculadora de Pantallas LED</h1>
+    <p>Calculá la configuración ideal para tu evento en segundos</p>
+  </div>
+
+  <div class="body">
+
+    <div class="section">
+      <h2 class="section-title">Datos de tu Proyecto</h2>
+
+      <div class="field">
+        <label>Ancho de la pantalla <span class="tip" title="Ancho aproximado que necesitás">?</span></label>
+        <div class="input-row">
+          <input type="number" id="width" value="10" step="0.5" min="0.5" inputmode="decimal" placeholder="Ej: 10">
+          <span class="unit">metros</span>
         </div>
-        <h1>Calculadora de Pantallas LED</h1>
-        <p>Calculá la configuración ideal para tu evento en segundos</p>
+      </div>
+
+      <div class="field">
+        <label>Alto de la pantalla <span class="tip" title="Alto aproximado que necesitás">?</span></label>
+        <div class="input-row">
+          <input type="number" id="height" value="6" step="0.5" min="0.5" inputmode="decimal" placeholder="Ej: 6">
+          <span class="unit">metros</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Distancia mínima de visualización <span class="tip" title="A qué distancia estará el público más cercano">?</span></label>
+        <div class="input-row">
+          <input type="number" id="distance" value="15" step="1" min="1" inputmode="decimal" placeholder="Ej: 15">
+          <span class="unit">metros</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Tipo de evento</label>
+        <select id="eventType">
+          <option value="indoor">Indoor (Interior)</option>
+          <option value="outdoor" selected>Outdoor (Exterior)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Uso</label>
+        <select id="useType">
+          <option value="rental">Alquiler / Evento temporal</option>
+          <option value="fixed">Instalación fija</option>
+        </select>
+      </div>
+
+      <button class="calc-btn" onclick="calculate()">🧮 Calcular Configuración</button>
     </div>
 
-    <!-- BODY -->
-    <div class="calculator-body">
+    <div class="section">
+      <h2 class="section-title">Resultados</h2>
 
-        <!-- INPUTS -->
-        <div class="inputs-section">
-            <h2 class="section-title">Datos de tu Proyecto</h2>
+      <div class="preview-wrap">
+        <div class="screen-box" id="screenBox" style="width:180px;height:108px;">10m × 6m</div>
+        <span class="dim-label dim-w" id="dimW">10.00m</span>
+        <span class="dim-label dim-h" id="dimH">6.00m</span>
+      </div>
 
-            <div class="input-group">
-                <label>
-                    Ancho deseado de la pantalla
-                    <span class="info-tooltip" title="Ancho aproximado que necesitas">?</span>
-                </label>
-                <div class="input-with-unit">
-                    <input type="number" id="width" placeholder="Ej: 10" step="0.5" min="1" value="10" inputmode="decimal">
-                    <span class="unit">metros</span>
-                </div>
-            </div>
+      <div class="card">
+        <h3>💎 Pitch Recomendado</h3>
+        <div class="card-value" id="pitchResult">—</div>
+        <div class="card-detail">Ideal para esta distancia de visualización</div>
+      </div>
 
-            <div class="input-group">
-                <label>
-                    Alto deseado de la pantalla
-                    <span class="info-tooltip" title="Alto aproximado que necesitas">?</span>
-                </label>
-                <div class="input-with-unit">
-                    <input type="number" id="height" placeholder="Ej: 6" step="0.5" min="1" value="6" inputmode="decimal">
-                    <span class="unit">metros</span>
-                </div>
-            </div>
+      <div class="card">
+        <h3>📐 Resolución Final</h3>
+        <div class="card-value" id="resolutionResult">—</div>
+        <div class="card-detail">Píxeles horizontales × verticales</div>
+      </div>
 
-            <div class="input-group">
-                <label>
-                    Distancia mínima de visualización
-                    <span class="info-tooltip" title="¿A qué distancia estará el público más cercano?">?</span>
-                </label>
-                <div class="input-with-unit">
-                    <input type="number" id="distance" placeholder="Ej: 15" step="1" min="1" value="15" inputmode="decimal">
-                    <span class="unit">metros</span>
-                </div>
-            </div>
+      <div class="card">
+        <h3>🧩 Módulos Necesarios</h3>
+        <div class="card-value" id="modulesResult">—</div>
+        <div class="card-detail">Total de paneles (500×500 mm)</div>
+      </div>
 
-            <div class="input-group">
-                <label>Tipo de evento</label>
-                <select id="eventType">
-                    <option value="indoor">Indoor (Interior)</option>
-                    <option value="outdoor" selected>Outdoor (Exterior)</option>
-                </select>
-            </div>
+      <div class="card">
+        <h3>⚖️ Peso Aproximado</h3>
+        <div class="card-value" id="weightResult">—</div>
+        <div class="card-detail">Peso total de la configuración</div>
+      </div>
 
-            <div class="input-group">
-                <label>Uso</label>
-                <select id="useType">
-                    <option value="rental">Alquiler / Evento temporal</option>
-                    <option value="fixed">Instalación fija</option>
-                </select>
-            </div>
+      <div class="card">
+        <h3>⚡ Consumo Eléctrico</h3>
+        <div class="card-value" id="powerResult">—</div>
+        <div class="card-detail">Consumo máximo estimado</div>
+      </div>
 
-            <button class="calculate-btn" onclick="calculate()">🧮 Calcular Configuración</button>
-        </div>
-
-        <!-- RESULTS -->
-        <div class="results-section">
-            <h2 class="section-title">Resultados</h2>
-
-            <div class="visual-preview" id="visualPreview">
-                <div class="screen-visualization" id="screenViz" style="width: 200px; height: 120px;">
-                    10m × 6m
-                </div>
-                <span class="dimension-label dimension-width">10.00m</span>
-                <span class="dimension-label dimension-height">6.00m</span>
-            </div>
-
-            <div class="result-card">
-                <h3>💎 Pitch Recomendado</h3>
-                <div class="result-value" id="pitchResult">P4.8</div>
-                <div class="result-detail">Ideal para esta distancia de visualización</div>
-            </div>
-
-            <div class="result-card">
-                <h3>📐 Resolución Final</h3>
-                <div class="result-value" id="resolutionResult">2083 × 1250 px</div>
-                <div class="result-detail">Pixeles horizontales × verticales</div>
-            </div>
-
-            <div class="result-card">
-                <h3>🧩 Módulos Necesarios</h3>
-                <div class="result-value" id="modulesResult">20 × 12 = 240</div>
-                <div class="result-detail">Cantidad total de paneles (500×500mm)</div>
-            </div>
-
-            <div class="result-card">
-                <h3>⚖️ Peso Aproximado</h3>
-                <div class="result-value" id="weightResult">960 kg</div>
-                <div class="result-detail">Peso total de la configuración</div>
-            </div>
-
-            <div class="result-card">
-                <h3>⚡ Consumo Eléctrico</h3>
-                <div class="result-value" id="powerResult">12 kW</div>
-                <div class="result-detail">Consumo máximo estimado</div>
-            </div>
-
-            <div class="recommendation-box">
-                <h3>✨ Recomendaciones</h3>
-                <ul id="recommendations">
-                    <li><span class="check-icon">✓</span> Pantalla P4.8 Outdoor es ideal para esta distancia</li>
-                    <li><span class="check-icon">✓</span> Excelente para conciertos y eventos grandes</li>
-                    <li><span class="check-icon">✓</span> Requiere estructura de soporte tipo truss</li>
-                    <li><span class="check-icon">✓</span> Se puede montar en 4-6 horas con equipo técnico</li>
-                </ul>
-            </div>
-        </div>
+      <div class="recs">
+        <h3>✨ Recomendaciones</h3>
+        <ul id="recommendations">
+          <li><span class="check">✓</span> Completá los datos y presioná Calcular</li>
+        </ul>
+      </div>
     </div>
 
-    <!-- CTA -->
-    <div class="cta-section">
-        <div class="cta-logo">
-            <img src="./tlo-logo.png" alt="TLO Visual" class="cta-logo-img">
-        </div>
-        <p>¿Te interesa esta configuración? Consultanos para recibir un presupuesto personalizado</p>
-        <div class="cta-buttons">
-            <a href="https://wa.me/34686514064" class="contact-btn" target="_blank" rel="noopener">📱 Consultar por WhatsApp</a>
-            <a href="/cdn-cgi/l/email-protection#e48d8a828ba490888b928d97918588ca878b89" class="contact-btn">📧 Enviar Email</a>
-        </div>
+  </div>
+
+  <div class="cta">
+    <div class="cta-logo">
+      <img src="./tlo-logo.png" alt="TLO Visual">
     </div>
+    <p>¿Te interesa esta configuración? Consultanos para recibir un presupuesto personalizado</p>
+    <div class="cta-btns">
+      <a href="https://wa.me/34686514064" class="btn-cta" target="_blank" rel="noopener">📱 Consultar por WhatsApp</a>
+      <a href="mailto:info@tlovisual.com" class="btn-cta">📧 Enviar Email</a>
+    </div>
+  </div>
 
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-    // ── Screen specs ────────────────────────────────────────────────
-    const screens = {
-        indoor: {
-            p2_5: { pitch: 2.5, moduleSize: 0.5, weight: 8,   power: 800 },
-            p3:   { pitch: 3.0, moduleSize: 0.5, weight: 7.5, power: 700 },
-            p3_9: { pitch: 3.9, moduleSize: 0.5, weight: 7,   power: 650 }
-        },
-        outdoor: {
-            p4:   { pitch: 4.0, moduleSize: 0.5, weight: 9,   power: 850 },
-            p4_8: { pitch: 4.8, moduleSize: 0.5, weight: 8.5, power: 800 },
-            p5:   { pitch: 5.0, moduleSize: 0.5, weight: 8,   power: 750 },
-            p6:   { pitch: 6.0, moduleSize: 0.5, weight: 7.5, power: 700 }
-        }
-    };
+<script>
+  const SCREENS = {
+    indoor: {
+      p2_5: { pitch:2.5, moduleSize:0.5, weight:8,   power:800 },
+      p3:   { pitch:3.0, moduleSize:0.5, weight:7.5, power:700 },
+      p3_9: { pitch:3.9, moduleSize:0.5, weight:7,   power:650 }
+    },
+    outdoor: {
+      p4:   { pitch:4.0, moduleSize:0.5, weight:9,   power:850 },
+      p4_8: { pitch:4.8, moduleSize:0.5, weight:8.5, power:800 },
+      p5:   { pitch:5.0, moduleSize:0.5, weight:8,   power:750 },
+      p6:   { pitch:6.0, moduleSize:0.5, weight:7.5, power:700 }
+    }
+  };
 
-    function calculate() {
-        const width     = parseFloat(document.getElementById('width').value);
-        const height    = parseFloat(document.getElementById('height').value);
-        const distance  = parseFloat(document.getElementById('distance').value);
-        const eventType = document.getElementById('eventType').value;
+  function calculate() {
+    const width    = parseFloat(document.getElementById('width').value);
+    const height   = parseFloat(document.getElementById('height').value);
+    const distance = parseFloat(document.getElementById('distance').value);
+    const type     = document.getElementById('eventType').value;
 
-        if (!width || !height || !distance) {
-            alert('Por favor completá todos los campos');
-            return;
-        }
-
-        const optimalPitchMin = distance * 0.25;
-        const optimalPitchMax = distance * 0.35;
-
-        const availableScreens = screens[eventType];
-        let selectedScreen = null;
-        let selectedPitchName = '';
-
-        for (const [name, spec] of Object.entries(availableScreens)) {
-            if (spec.pitch >= optimalPitchMin && spec.pitch <= optimalPitchMax) {
-                selectedScreen = spec;
-                selectedPitchName = name.toUpperCase().replace('_', '.');
-                break;
-            }
-        }
-
-        if (!selectedScreen) {
-            const pitches = Object.entries(availableScreens);
-            const closest = pitches.reduce((prev, curr) => {
-                const prevDiff = Math.abs(prev[1].pitch - optimalPitchMin);
-                const currDiff = Math.abs(curr[1].pitch - optimalPitchMin);
-                return currDiff < prevDiff ? curr : prev;
-            });
-            selectedScreen = closest[1];
-            selectedPitchName = closest[0].toUpperCase().replace('_', '.');
-        }
-
-        const moduleSize = selectedScreen.moduleSize;
-        const modulesX   = Math.ceil(width  / moduleSize);
-        const modulesY   = Math.ceil(height / moduleSize);
-        const totalModules = modulesX * modulesY;
-
-        const finalWidth  = (modulesX * moduleSize).toFixed(2);
-        const finalHeight = (modulesY * moduleSize).toFixed(2);
-
-        const pixelDensity = 1000 / selectedScreen.pitch;
-        const resolutionX  = Math.round(finalWidth  * pixelDensity);
-        const resolutionY  = Math.round(finalHeight * pixelDensity);
-
-        const totalWeight = Math.round(totalModules * selectedScreen.weight);
-        const totalPower  = (totalModules * selectedScreen.power / 1000).toFixed(1);
-
-        document.getElementById('pitchResult').textContent      = selectedPitchName;
-        document.getElementById('resolutionResult').textContent = `${resolutionX} × ${resolutionY} px`;
-        document.getElementById('modulesResult').textContent    = `${modulesX} × ${modulesY} = ${totalModules}`;
-        document.getElementById('weightResult').textContent     = `${totalWeight} kg`;
-        document.getElementById('powerResult').textContent      = `${totalPower} kW`;
-
-        updateVisualization(finalWidth, finalHeight);
-        document.querySelector('.dimension-width').textContent  = `${finalWidth}m`;
-        document.querySelector('.dimension-height').textContent = `${finalHeight}m`;
-
-        updateRecommendations(selectedPitchName, distance, eventType, totalModules);
+    if (!width || !height || !distance || width <= 0 || height <= 0 || distance <= 0) {
+      alert('Completá todos los campos con valores válidos');
+      return;
     }
 
-    function updateVisualization(width, height) {
-        const viz = document.getElementById('screenViz');
-        const ratio = width / height;
-        let displayWidth, displayHeight;
+    const pitchMin = distance * 0.25;
+    const avail    = SCREENS[type];
 
-        if (ratio > 1.67) {
-            displayWidth  = 300;
-            displayHeight = 300 / ratio;
-        } else {
-            displayHeight = 180;
-            displayWidth  = 180 * ratio;
-        }
-
-        viz.style.width  = displayWidth  + 'px';
-        viz.style.height = displayHeight + 'px';
-        viz.textContent  = `${width}m × ${height}m`;
+    let sel = null, selName = '';
+    for (const [k, v] of Object.entries(avail)) {
+      if (v.pitch >= pitchMin && v.pitch <= distance * 0.35) { sel = v; selName = k; break; }
+    }
+    if (!sel) {
+      const best = Object.entries(avail).reduce((p, c) =>
+        Math.abs(c[1].pitch - pitchMin) < Math.abs(p[1].pitch - pitchMin) ? c : p);
+      sel = best[1]; selName = best[0];
     }
 
-    function updateRecommendations(pitch, distance, eventType, modules) {
-        const recs = [];
+    const label = selName.toUpperCase().replace('_', '.');
+    const ms    = sel.moduleSize;
+    const mX    = Math.ceil(width  / ms);
+    const mY    = Math.ceil(height / ms);
+    const tot   = mX * mY;
+    const fw    = parseFloat((mX * ms).toFixed(2));
+    const fh    = parseFloat((mY * ms).toFixed(2));
+    const dens  = 1000 / sel.pitch;
 
-        recs.push(`Pantalla ${pitch} ${eventType === 'outdoor' ? 'Outdoor' : 'Indoor'} es ideal para esta distancia`);
+    document.getElementById('pitchResult').textContent      = label;
+    document.getElementById('resolutionResult').textContent = Math.round(fw*dens) + ' × ' + Math.round(fh*dens) + ' px';
+    document.getElementById('modulesResult').textContent    = mX + ' × ' + mY + ' = ' + tot;
+    document.getElementById('weightResult').textContent     = Math.round(tot * sel.weight) + ' kg';
+    document.getElementById('powerResult').textContent      = (tot * sel.power / 1000).toFixed(1) + ' kW';
 
-        if (distance < 5)       recs.push('Excelente definición para eventos corporativos y presentaciones');
-        else if (distance < 15) recs.push('Perfecta para conciertos medianos y eventos sociales');
-        else                    recs.push('Ideal para conciertos grandes y festivales al aire libre');
+    updatePreview(fw, fh);
+    document.getElementById('dimW').textContent = fw + 'm';
+    document.getElementById('dimH').textContent = fh + 'm';
+    updateRecs(label, distance, type, tot);
+  }
 
-        if (modules < 100)      recs.push('Configuración ligera, montaje rápido (2-3 horas)');
-        else if (modules < 200) recs.push('Requiere estructura de soporte tipo truss o ground support');
-        else                    recs.push('Requiere estructura reforzada y equipo técnico especializado');
+  function updatePreview(w, h) {
+    const box = document.getElementById('screenBox');
+    const r = w / h;
+    let bw, bh;
+    if (r > 1.67) { bw = 220; bh = 220 / r; }
+    else          { bh = 130; bw = 130 * r; }
+    box.style.width  = Math.round(bw) + 'px';
+    box.style.height = Math.round(bh) + 'px';
+    box.textContent  = w + 'm × ' + h + 'm';
+  }
 
-        if (eventType === 'outdoor') recs.push('Recomendamos sistema de protección contra lluvia (IP65)');
-        else                         recs.push('Sistema con control de brillo automático para interiores');
+  function updateRecs(pitch, dist, type, modules) {
+    const list = [
+      'Pantalla ' + pitch + ' ' + (type==='outdoor'?'Outdoor':'Indoor') + ' es ideal para esta distancia',
+      dist < 5 ? 'Excelente definición para eventos corporativos y presentaciones'
+               : dist < 15 ? 'Perfecta para conciertos medianos y eventos sociales'
+                           : 'Ideal para conciertos grandes y festivales al aire libre',
+      modules < 100 ? 'Configuración ligera, montaje rápido (2-3 horas)'
+                    : modules < 200 ? 'Requiere estructura de soporte tipo truss o ground support'
+                                    : 'Requiere estructura reforzada y equipo técnico especializado',
+      type==='outdoor' ? 'Recomendamos sistema de protección contra lluvia (IP65)'
+                       : 'Sistema con control de brillo automático para interiores'
+    ];
+    document.getElementById('recommendations').innerHTML =
+      list.map(r => '<li><span class="check">✓</span> ' + r + '</li>').join('');
+  }
 
-        document.getElementById('recommendations').innerHTML =
-            recs.map(r => `<li><span class="check-icon">✓</span> ${r}</li>`).join('');
-    }
+  ['width','height','distance','eventType','useType'].forEach(function(id) {
+    var el = document.getElementById(id);
+    el.addEventListener('input',  calculate);
+    el.addEventListener('change', calculate);
+  });
 
-    // Auto-recalculate on input change
-    ['width', 'height', 'distance', 'eventType', 'useType'].forEach(id => {
-        document.getElementById(id).addEventListener('change', calculate);
-        document.getElementById(id).addEventListener('input', calculate);
-    });
+  calculate();
 
-    // Run on load
-    window.addEventListener('load', calculate);
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(function(){});
 
-    // ── PWA: Service Worker ─────────────────────────────────────────
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js').catch(err => {
-                console.warn('SW registration failed:', err);
-            });
-        });
-    }
+  function syncOnline() {
+    document.getElementById('offline-banner').classList.toggle('show', !navigator.onLine);
+  }
+  window.addEventListener('online', syncOnline);
+  window.addEventListener('offline', syncOnline);
+  syncOnline();
 
-    // ── PWA: Offline Banner ─────────────────────────────────────────
-    const offlineBanner = document.getElementById('offline-banner');
+  var deferredPrompt = null;
+  var installBanner  = document.getElementById('install-banner');
 
-    function updateOnlineStatus() {
-        offlineBanner.classList.toggle('visible', !navigator.onLine);
-    }
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault(); deferredPrompt = e;
+    if (!localStorage.getItem('pwa-dismissed'))
+      setTimeout(function(){ installBanner.classList.add('show'); }, 2500);
+  });
 
-    window.addEventListener('online',  updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
-    updateOnlineStatus();
+  document.getElementById('btn-install').addEventListener('click', function() {
+    if (!deferredPrompt) return;
+    installBanner.classList.remove('show');
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(){ deferredPrompt = null; });
+  });
 
-    // ── PWA: Install Prompt ─────────────────────────────────────────
-    let deferredPrompt = null;
-    const installBanner  = document.getElementById('install-banner');
-    const btnInstall     = document.getElementById('btn-install');
-    const btnDismiss     = document.getElementById('btn-dismiss');
+  document.getElementById('btn-dismiss').addEventListener('click', function() {
+    installBanner.classList.remove('show');
+    localStorage.setItem('pwa-dismissed','1');
+  });
 
-    window.addEventListener('beforeinstallprompt', e => {
-        e.preventDefault();
-        deferredPrompt = e;
-
-        // Only show if user hasn't dismissed before
-        if (!localStorage.getItem('pwa-dismissed')) {
-            setTimeout(() => installBanner.classList.add('visible'), 2000);
-        }
-    });
-
-    btnInstall.addEventListener('click', async () => {
-        if (!deferredPrompt) return;
-        installBanner.classList.remove('visible');
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        deferredPrompt = null;
-    });
-
-    btnDismiss.addEventListener('click', () => {
-        installBanner.classList.remove('visible');
-        localStorage.setItem('pwa-dismissed', '1');
-    });
-
-    window.addEventListener('appinstalled', () => {
-        installBanner.classList.remove('visible');
-        deferredPrompt = null;
-    });
-
+  window.addEventListener('appinstalled', function() {
+    installBanner.classList.remove('show');
+    deferredPrompt = null;
+  });
 </script>
 
 </body>
