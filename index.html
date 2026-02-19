@@ -183,6 +183,20 @@
             text-align: center;
         }
 
+        .header-logo {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .logo-img {
+            height: 60px;
+            width: auto;
+            /* White filter so el logo azul se vea bien sobre el fondo naranja */
+            filter: brightness(0) invert(1);
+            object-fit: contain;
+        }
+
         .calculator-header h1 {
             font-size: 2.5rem;
             margin-bottom: 1rem;
@@ -443,6 +457,19 @@
             border-top: 2px solid rgba(255, 255, 255, 0.1);
         }
 
+        .cta-logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .cta-logo-img {
+            height: 48px;
+            width: auto;
+            object-fit: contain;
+            opacity: 0.9;
+        }
+
         .cta-section p {
             color: var(--light-gray);
             margin-bottom: 1.5rem;
@@ -501,9 +528,9 @@
                 padding: 1.25rem;
             }
 
-            .calculator-header {
-                padding: 1.75rem 1.25rem;
-            }
+            .calculator-header { padding: 1.75rem 1.25rem; }
+
+            .logo-img { height: 46px; }
 
             .calculator-header h1 {
                 font-size: 1.6rem;
@@ -557,6 +584,9 @@
             .calculator-header {
                 padding: 1.5rem 1rem;
             }
+
+            .logo-img { height: 38px; }
+            .cta-logo-img { height: 36px; }
 
             .calculator-header h1 {
                 font-size: 1.3rem;
@@ -631,7 +661,10 @@
 
     <!-- HEADER -->
     <div class="calculator-header">
-        <h1>🖥️ Calculadora de Pantallas LED</h1>
+        <div class="header-logo">
+            <img src="./tlo-logo.png" alt="TLO Visual" class="logo-img">
+        </div>
+        <h1>Calculadora de Pantallas LED</h1>
         <p>Calculá la configuración ideal para tu evento en segundos</p>
     </div>
 
@@ -750,10 +783,13 @@
 
     <!-- CTA -->
     <div class="cta-section">
+        <div class="cta-logo">
+            <img src="./tlo-logo.png" alt="TLO Visual" class="cta-logo-img">
+        </div>
         <p>¿Te interesa esta configuración? Consultanos para recibir un presupuesto personalizado</p>
         <div class="cta-buttons">
             <a href="https://wa.me/34686514064" class="contact-btn" target="_blank" rel="noopener">📱 Consultar por WhatsApp</a>
-            <a href="/cdn-cgi/l/email-protection#c8a1a6aea788bca4a7bea1bbbda9a4e6aba7a5" class="contact-btn">📧 Enviar Email</a>
+            <a href="mailto:info@tlovisual.com" class="contact-btn">📧 Enviar Email</a>
         </div>
     </div>
 
