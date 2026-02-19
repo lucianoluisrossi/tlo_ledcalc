@@ -968,4 +968,17 @@
         deferredPrompt = null;
     });
 
-    btnDismiss.addEventListener(
+    btnDismiss.addEventListener('click', () => {
+        installBanner.classList.remove('visible');
+        localStorage.setItem('pwa-dismissed', '1');
+    });
+
+    window.addEventListener('appinstalled', () => {
+        installBanner.classList.remove('visible');
+        deferredPrompt = null;
+    });
+
+</script>
+
+</body>
+</html>
