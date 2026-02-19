@@ -192,9 +192,10 @@
         .logo-img {
             height: 60px;
             width: auto;
-            /* White filter so el logo azul se vea bien sobre el fondo naranja */
-            filter: brightness(0) invert(1);
             object-fit: contain;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 0.5rem 1.2rem;
+            border-radius: 10px;
         }
 
         .calculator-header h1 {
@@ -530,7 +531,7 @@
 
             .calculator-header { padding: 1.75rem 1.25rem; }
 
-            .logo-img { height: 46px; }
+            .logo-img { height: 46px; padding: 0.4rem 1rem; }
 
             .calculator-header h1 {
                 font-size: 1.6rem;
@@ -585,7 +586,7 @@
                 padding: 1.5rem 1rem;
             }
 
-            .logo-img { height: 38px; }
+            .logo-img { height: 38px; padding: 0.35rem 0.9rem; }
             .cta-logo-img { height: 36px; }
 
             .calculator-header h1 {
@@ -789,13 +790,13 @@
         <p>¿Te interesa esta configuración? Consultanos para recibir un presupuesto personalizado</p>
         <div class="cta-buttons">
             <a href="https://wa.me/34686514064" class="contact-btn" target="_blank" rel="noopener">📱 Consultar por WhatsApp</a>
-            <a href="mailto:info@tlovisual.com" class="contact-btn">📧 Enviar Email</a>
+            <a href="/cdn-cgi/l/email-protection#e48d8a828ba490888b928d97918588ca878b89" class="contact-btn">📧 Enviar Email</a>
         </div>
     </div>
 
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // ── Screen specs ────────────────────────────────────────────────
     const screens = {
         indoor: {
@@ -967,9 +968,4 @@
         deferredPrompt = null;
     });
 
-    btnDismiss.addEventListener('click', () => {
-        installBanner.classList.remove('visible');
-        localStorage.setItem('pwa-dismissed', '1');
-    });
-
-    window.addEventL
+    btnDismiss.addEventListener(
