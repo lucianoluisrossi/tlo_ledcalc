@@ -52,6 +52,9 @@
             display: flex;
             align-items: flex-start;
             justify-content: center;
+            /* Prevent horizontal overflow on mobile */
+            overflow-x: hidden;
+            width: 100%;
         }
 
         h1, h2, h3 {
@@ -167,6 +170,7 @@
         .calculator-container {
             max-width: 1200px;
             width: 100%;
+            min-width: 0;
             background: var(--dark-gray);
             border-radius: 20px;
             overflow: hidden;
@@ -481,27 +485,125 @@
         /* ── Responsive ───────────────────────────────────────────── */
 
         @media (max-width: 968px) {
-            body { padding: 1rem; padding-bottom: calc(6rem + var(--safe-bottom)); }
+            body {
+                padding: 0.75rem;
+                padding-top: calc(0.75rem + var(--safe-top));
+                padding-bottom: calc(5rem + var(--safe-bottom));
+            }
+
+            .calculator-container {
+                border-radius: 14px;
+            }
 
             .calculator-body {
                 grid-template-columns: 1fr;
-                gap: 2rem;
-                padding: 1.5rem;
+                gap: 1.5rem;
+                padding: 1.25rem;
             }
 
-            .calculator-header { padding: 2rem 1.5rem; }
-            .calculator-header h1 { font-size: 1.8rem; }
+            .calculator-header {
+                padding: 1.75rem 1.25rem;
+            }
 
-            .result-value { font-size: 1.5rem; }
+            .calculator-header h1 {
+                font-size: 1.6rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .calculator-header p {
+                font-size: 0.95rem;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+            }
+
+            .result-value {
+                font-size: 1.5rem;
+            }
+
+            /* Visual preview: dimension labels need more room */
+            .visual-preview {
+                padding: 2.5rem 1.5rem 2.5rem 1rem;
+                overflow: visible;
+            }
 
             .dimension-height {
-                right: -2.5rem;
+                right: -2.8rem;
+            }
+
+            /* CTA buttons stack */
+            .cta-section {
+                padding: 1.5rem 1.25rem;
+            }
+
+            .contact-btn {
+                width: 100%;
+                text-align: center;
             }
         }
 
         @media (max-width: 480px) {
-            .calculator-header h1 { font-size: 1.5rem; }
-            .calculate-btn { font-size: 1rem; }
+            body {
+                padding: 0.5rem;
+                padding-top: calc(0.5rem + var(--safe-top));
+                padding-bottom: calc(5rem + var(--safe-bottom));
+            }
+
+            .calculator-container {
+                border-radius: 10px;
+            }
+
+            .calculator-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .calculator-header h1 {
+                font-size: 1.3rem;
+            }
+
+            .calculator-header p {
+                font-size: 0.85rem;
+            }
+
+            .calculator-body {
+                padding: 1rem;
+                gap: 1.25rem;
+            }
+
+            .input-group input,
+            .input-group select {
+                padding: 0.85rem;
+                font-size: 0.95rem;
+            }
+
+            .unit {
+                padding: 0.85rem 0.6rem;
+                min-width: 50px;
+                font-size: 0.85rem;
+            }
+
+            .result-card {
+                padding: 1.1rem;
+            }
+
+            .result-value {
+                font-size: 1.3rem;
+            }
+
+            .calculate-btn {
+                font-size: 0.95rem;
+                padding: 1rem 1.5rem;
+            }
+
+            /* Prevent dimension-height label from clipping off-screen */
+            .visual-preview {
+                padding: 2.5rem 3.5rem 2.5rem 1rem;
+            }
+
+            .dimension-height {
+                right: -2.5rem;
+            }
         }
     </style>
 </head>
@@ -651,13 +753,13 @@
         <p>¿Te interesa esta configuración? Consultanos para recibir un presupuesto personalizado</p>
         <div class="cta-buttons">
             <a href="https://wa.me/34686514064" class="contact-btn" target="_blank" rel="noopener">📱 Consultar por WhatsApp</a>
-            <a href="mailto:info@tlovisual.com" class="contact-btn">📧 Enviar Email</a>
+            <a href="/cdn-cgi/l/email-protection#c8a1a6aea788bca4a7bea1bbbda9a4e6aba7a5" class="contact-btn">📧 Enviar Email</a>
         </div>
     </div>
 
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // ── Screen specs ────────────────────────────────────────────────
     const screens = {
         indoor: {
@@ -834,11 +936,4 @@
         localStorage.setItem('pwa-dismissed', '1');
     });
 
-    window.addEventListener('appinstalled', () => {
-        installBanner.classList.remove('visible');
-        deferredPrompt = null;
-    });
-</script>
-
-</body>
-</html>
+    window.addEventL
