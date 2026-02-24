@@ -371,6 +371,11 @@
 
 <div id="offline-banner">⚡ Sin conexión — funciona igual offline</div>
 
+<div id="update-banner" style="display:none;position:fixed;top:env(safe-area-inset-top,0);left:0;right:0;background:#FF5722;color:#fff;padding:0.65rem 1rem;font-size:0.82rem;font-weight:600;z-index:9999;align-items:center;justify-content:space-between;gap:0.75rem;font-family:DM Sans,sans-serif;">
+  <span>🆕 Nueva versión disponible</span>
+  <button onclick="window.location.reload()" style="background:rgba(255,255,255,0.25);border:none;color:#fff;padding:0.3rem 0.9rem;border-radius:6px;font-weight:700;font-size:0.8rem;cursor:pointer;">Actualizar</button>
+</div>
+
 <div id="install-banner">
   <div class="ib-row">
     <div class="ib-icon">📱</div>
@@ -1032,7 +1037,22 @@
   };
 
   // === PWA ===
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(function(){});
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').then(function(reg) {
+      reg.addEventListener('updatefound', function() {
+        var newWorker = reg.installing;
+        newWorker.addEventListener('statechange', function() {
+          if (newWorker.state === 'activated' && navigator.serviceWorker.controller) {
+            var banner = document.getElementById('update-banner');
+            if (banner) banner.style.display = 'flex';
+          }
+        });
+      });
+    }).catch(function(){});
+    navigator.serviceWorker.addEventListener('controllerchange', function() {
+      window.location.reload();
+    });
+  }
 
   function syncOnline() { document.getElementById('offline-banner').classList.toggle('show', !navigator.onLine); }
   window.addEventListener('online', syncOnline); window.addEventListener('offline', syncOnline); syncOnline();
