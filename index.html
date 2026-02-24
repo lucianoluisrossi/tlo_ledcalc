@@ -1,244 +1,375 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#FF5722">
-  <meta name="description" content="Calculá la configuración ideal de pantallas LED para tu evento.">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="LED Calc">
-  <meta name="mobile-web-app-capable" content="yes">
-  <title>Calculadora LED - TLO Visual</title>
-  <link rel="manifest" href="./manifest.json">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --black:#0A0A0A; --dark:#1E1E1E; --mid:#424242;
-      --light:#E0E0E0; --white:#FFFFFF;
-      --orange:#FF5722; --orange2:#FF8A50; --green:#4CAF50;
-    }
-    html, body { width: 100%; overflow-x: hidden; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #1a1a1a 0%, #2d1b1b 100%);
-      color: var(--white);
-      min-height: 100vh;
-      padding: 1.5rem;
-      padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
-      padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-    }
-    h1, h2, h3 { font-family: 'Poppins', sans-serif; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FF5722">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TLO LED Calc">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Calculadora LED — TLO Visual</title>
+<link rel="manifest" href="./manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-    .app {
-      width: 100%;
-      max-width: 1100px;
-      background: var(--dark);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    }
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; overflow-x: hidden; }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .fade-up { animation: fadeUp .35s ease-out forwards; }
 
-    /* Header */
-    .header {
-      background: linear-gradient(135deg, var(--orange), var(--orange2));
-      padding: 2rem 1.5rem 1.5rem;
-      text-align: center;
-    }
-    .header-logo { display:flex; justify-content:center; margin-bottom:1rem; }
-    .header-logo img {
-      height: 52px; width: auto;
-      background: rgba(255,255,255,0.93);
-      padding: 0.45rem 1rem; border-radius: 8px;
-      object-fit: contain;
-    }
-    .header h1 { font-size: clamp(1.2rem, 4vw, 2rem); margin-bottom: 0.4rem; line-height: 1.2; }
-    .header p  { font-size: clamp(0.8rem, 2.5vw, 1rem); opacity: 0.95; }
+  /* ── App shell ───────────────────────────────────────────── */
+  body {
+    background: #0f0f0f;
+    font-family: 'DM Sans', sans-serif;
+    color: #f0f0f0;
+    padding: 0;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    min-height: 100vh;
+  }
 
-    /* Body grid */
-    .body {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      padding: 2rem;
-    }
-    @media (max-width: 680px) {
-      .body { grid-template-columns: 1fr; gap: 1.5rem; padding: 1rem; }
-    }
+  #app {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 12px 12px 40px;
+  }
 
-    .section { display: flex; flex-direction: column; gap: 1.25rem; }
-    .section-title {
-      font-size: clamp(1rem, 3vw, 1.3rem);
-      padding-bottom: 0.65rem;
-      border-bottom: 2px solid var(--orange);
-    }
+  /* ── Header ──────────────────────────────────────────────── */
+  .app-header {
+    background: linear-gradient(135deg, #FF5722, #FF8A50);
+    border-radius: 16px;
+    padding: 18px 20px 16px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .app-header-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  .app-header-logo img {
+    height: 44px;
+    width: auto;
+    background: rgba(255,255,255,0.92);
+    padding: 6px 14px;
+    border-radius: 8px;
+    object-fit: contain;
+  }
+  .app-header h1 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2px;
+  }
+  .app-header p {
+    font-size: 11px;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 0.5px;
+  }
 
-    /* Fields */
-    .field { display: flex; flex-direction: column; gap: 0.4rem; }
-    .field label {
-      font-weight: 600; font-size: 0.88rem;
-      color: var(--light); display: flex; align-items: center; gap: 0.4rem;
-    }
-    .tip {
-      display:inline-flex; align-items:center; justify-content:center;
-      width:16px; height:16px;
-      background:rgba(255,87,34,0.25); color:var(--orange);
-      border-radius:50%; font-size:0.68rem; font-weight:700; cursor:help; flex-shrink:0;
-    }
-    .input-row { display:flex; gap:0.5rem; align-items:stretch; }
-    .input-row input { flex:1; min-width:0; }
-    .unit {
-      background:rgba(255,87,34,0.18); color:var(--orange);
-      font-weight:600; font-size:0.82rem;
-      padding:0 0.8rem; border-radius:8px;
-      display:flex; align-items:center; white-space:nowrap; flex-shrink:0;
-    }
-    input, select {
-      width:100%; background:var(--black);
-      border:2px solid rgba(255,255,255,0.1);
-      color:var(--white); padding:0.82rem 0.9rem;
-      border-radius:8px; font-size:1rem;
-      font-family:'Roboto Mono', monospace;
-      transition:border-color .25s, box-shadow .25s;
-      -webkit-appearance:none; appearance:none; min-width:0;
-    }
-    select {
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath stroke='%23FF5722' stroke-width='2' fill='none' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
-      background-repeat:no-repeat; background-position:right 0.9rem center; padding-right:2.4rem;
-    }
-    input:focus, select:focus {
-      outline:none; border-color:var(--orange);
-      box-shadow:0 0 0 3px rgba(255,87,34,0.2);
-    }
-    .calc-btn {
-      width:100%; background:linear-gradient(135deg, var(--orange), var(--orange2));
-      color:var(--white); border:none; border-radius:8px;
-      padding:1rem; font-size:1rem; font-weight:700;
-      font-family:'Poppins', sans-serif; cursor:pointer;
-      transition:transform .2s, box-shadow .2s; margin-top:0.5rem;
-      -webkit-tap-highlight-color:transparent;
-    }
-    .calc-btn:hover  { transform:translateY(-2px); box-shadow:0 8px 24px rgba(255,87,34,0.4); }
-    .calc-btn:active { transform:translateY(0); }
+  /* ── Cards ───────────────────────────────────────────────── */
+  .lc-card {
+    background: #1a1a1a;
+    border-radius: 14px;
+    padding: 16px;
+    border: 1px solid #2a2a2a;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+  .lc-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #FF5722;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 12px;
+  }
 
-    /* Cards */
-    .card {
-      background:var(--black); border:2px solid rgba(255,87,34,0.25);
-      border-radius:10px; padding:1rem 1.2rem;
-      transition:border-color .25s, transform .25s;
-      animation:fadeUp .4s ease;
-    }
-    .card:hover { border-color:var(--orange); transform:translateX(4px); }
-    .card h3 { font-size:0.72rem; text-transform:uppercase; letter-spacing:1px; color:var(--light); margin-bottom:0.45rem; }
-    .card-value {
-      font-size:clamp(1.15rem, 3.5vw, 1.7rem);
-      font-weight:700; color:var(--orange);
-      font-family:'Roboto Mono', monospace; word-break:break-word;
-    }
-    .card-detail { font-size:0.78rem; color:var(--mid); margin-top:0.3rem; }
+  /* ── Tags ────────────────────────────────────────────────── */
+  .lc-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .lc-tag { font-size: 10px; padding: 3px 9px; border-radius: 16px; font-weight: 600; }
+  .lc-tag-green  { background: rgba(74,138,74,0.2);  color: #6ab86a; border: 1px solid rgba(74,138,74,0.3); }
+  .lc-tag-blue   { background: rgba(74,100,180,0.2); color: #7baae8; border: 1px solid rgba(74,100,180,0.3); }
+  .lc-tag-yellow { background: rgba(180,160,60,0.2); color: #d4be6a; border: 1px solid rgba(180,160,60,0.3); }
+  .lc-tag-purple { background: rgba(140,74,180,0.2); color: #b87ae8; border: 1px solid rgba(140,74,180,0.3); }
 
-    /* Preview */
-    .preview-wrap {
-      background:var(--black); border:2px dashed rgba(255,255,255,0.15);
-      border-radius:10px; padding:2rem 3.5rem 2.5rem 1.5rem;
-      display:flex; align-items:center; justify-content:center;
-      min-height:150px; position:relative; overflow:visible;
-    }
-    .screen-box {
-      border:3px solid var(--orange); background:rgba(255,87,34,0.1);
-      display:flex; align-items:center; justify-content:center;
-      font-family:'Roboto Mono',monospace; color:var(--orange);
-      font-weight:600; font-size:0.82rem;
-      transition:width .5s ease, height .5s ease;
-    }
-    .dim-label {
-      position:absolute; background:var(--orange); color:var(--white);
-      padding:0.22rem 0.55rem; border-radius:4px;
-      font-size:0.72rem; font-weight:600; white-space:nowrap;
-    }
-    .dim-w { bottom:0.5rem; left:50%; transform:translateX(-50%); }
-    .dim-h { right:0.5rem; top:50%; transform:translateY(-50%) rotate(90deg); }
+  /* ── Select ──────────────────────────────────────────────── */
+  .lc-select {
+    width: 100%;
+    padding: 11px 36px 11px 13px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    background: #111 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23FF5722' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 12px center;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: #f0f0f0;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .lc-select-sm {
+    padding: 9px 28px 9px 10px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #111 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23FF5722' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 8px center;
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    color: #f0f0f0;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+  }
 
-    /* Recs */
-    .recs {
-      background:linear-gradient(135deg, rgba(255,87,34,0.07), rgba(255,138,80,0.07));
-      border:2px solid var(--orange); border-radius:10px; padding:1.1rem;
-    }
-    .recs h3 { color:var(--orange); font-size:0.9rem; margin-bottom:0.65rem; display:flex; align-items:center; gap:0.4rem; }
-    .recs ul { list-style:none; display:flex; flex-direction:column; gap:0.55rem; }
-    .recs li { display:flex; align-items:flex-start; gap:0.45rem; font-size:0.87rem; color:var(--light); line-height:1.4; }
-    .recs li .check { color:var(--green); font-weight:700; flex-shrink:0; margin-top:1px; }
+  /* ── Grid ────────────────────────────────────────────────── */
+  .lc-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .lc-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 
-    /* CTA */
-    .cta { background:var(--black); border-top:2px solid rgba(255,255,255,0.08); padding:1.5rem; text-align:center; }
-    .cta-logo { display:flex; justify-content:center; margin-bottom:1rem; }
-    .cta-logo img { height:42px; width:auto; object-fit:contain; opacity:0.9; }
-    .cta p { color:var(--light); font-size:0.92rem; margin-bottom:1.1rem; }
-    .cta-btns { display:flex; flex-wrap:wrap; gap:0.75rem; justify-content:center; }
-    .btn-cta {
-      background:transparent; border:2px solid var(--orange); color:var(--orange);
-      padding:0.8rem 1.4rem; border-radius:8px; font-weight:600; font-size:0.88rem;
-      text-decoration:none; display:inline-block;
-      transition:background .25s, color .25s;
-      -webkit-tap-highlight-color:transparent;
-    }
-    .btn-cta:hover { background:var(--orange); color:var(--white); }
-    @media (max-width:480px) { .btn-cta { width:100%; text-align:center; } }
+  /* ── Stepper ─────────────────────────────────────────────── */
+  .lc-stepper-group { display: flex; flex-direction: column; gap: 5px; }
+  .lc-stepper-label { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #666; }
+  .lc-stepper {
+    display: flex;
+    align-items: center;
+    background: #111;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #333;
+  }
+  .lc-stepper button {
+    width: 40px; height: 42px;
+    border: none;
+    background: transparent;
+    font-size: 20px;
+    cursor: pointer;
+    color: #FF5722;
+    font-weight: 300;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s;
+  }
+  .lc-stepper button:hover  { background: rgba(255,87,34,0.1); }
+  .lc-stepper button:active { background: rgba(255,87,34,0.2); }
+  .lc-stepper input {
+    flex: 1;
+    text-align: center;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    color: #f0f0f0;
+    outline: none;
+    min-width: 0;
+  }
+  .lc-stepper-unit { font-size: 12px; color: #555; margin-right: 6px; font-family: 'DM Mono', monospace; }
 
-    /* PWA banners */
-    #offline-banner {
-      display:none; position:fixed; top:env(safe-area-inset-top,0); left:0; right:0;
-      background:#b71c1c; color:white; text-align:center;
-      padding:0.6rem 1rem; font-size:0.82rem; font-weight:600; z-index:9999;
-    }
-    #offline-banner.show { display:block; }
-    #install-banner {
-      display:none; position:fixed;
-      bottom:calc(1rem + env(safe-area-inset-bottom,0px));
-      left:50%; transform:translateX(-50%);
-      width:min(400px, calc(100vw - 2rem));
-      background:var(--dark); border:2px solid var(--orange);
-      border-radius:12px; padding:1rem 1.2rem;
-      box-shadow:0 8px 32px rgba(0,0,0,0.5); z-index:9998;
-      animation:slideUp .35s ease;
-    }
-    #install-banner.show { display:block; }
-    .ib-row { display:flex; align-items:center; gap:0.75rem; }
-    .ib-icon { font-size:1.8rem; flex-shrink:0; }
-    .ib-text strong { display:block; font-size:0.88rem; }
-    .ib-text span { font-size:0.76rem; color:var(--mid); }
-    .ib-btns { display:flex; gap:0.5rem; margin-top:0.7rem; }
-    .ib-install {
-      flex:1; background:var(--orange); color:white; border:none;
-      border-radius:7px; padding:0.52rem 1rem; font-weight:600;
-      font-size:0.82rem; cursor:pointer; font-family:'Inter',sans-serif;
-    }
-    .ib-dismiss {
-      background:transparent; color:var(--mid); border:1px solid var(--mid);
-      border-radius:7px; padding:0.52rem 1rem; font-size:0.82rem;
-      cursor:pointer; font-family:'Inter',sans-serif;
-    }
-    .ib-dismiss:hover { color:var(--white); }
+  /* ── Toggle ──────────────────────────────────────────────── */
+  .lc-toggle {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 14px;
+    background: #111;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 1px solid #2a2a2a;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .lc-toggle-label { font-size: 13px; font-weight: 500; color: #ccc; }
+  .lc-toggle-track { width: 40px; height: 22px; border-radius: 11px; transition: background .2s; position: relative; flex-shrink: 0; }
+  .lc-toggle-thumb { width: 18px; height: 18px; border-radius: 9px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.4); transition: transform .2s; position: absolute; top: 2px; }
 
-    @keyframes fadeUp {
-      from { opacity:0; transform:translateY(12px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-    @keyframes slideUp {
-      from { opacity:0; transform:translateX(-50%) translateY(16px); }
-      to   { opacity:1; transform:translateX(-50%) translateY(0); }
-    }
-  </style>
+  /* ── Tabs ────────────────────────────────────────────────── */
+  .lc-tabs {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 12px;
+    background: #111;
+    border-radius: 12px;
+    padding: 3px;
+    border: 1px solid #2a2a2a;
+  }
+  .lc-tab {
+    flex: 1;
+    padding: 8px 4px;
+    border-radius: 9px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    color: #555;
+    transition: all .2s;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+    letter-spacing: 0.3px;
+  }
+  .lc-tab.active { background: #FF5722; color: #fff; box-shadow: 0 2px 8px rgba(255,87,34,0.35); }
+  .lc-tab-icon { display: block; font-size: 14px; margin-bottom: 2px; }
+
+  /* ── Stat cards ──────────────────────────────────────────── */
+  .lc-stat { border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 3px; }
+  .lc-stat-default { background: #111; border: 1px solid #2a2a2a; }
+  .lc-stat-accent  { background: linear-gradient(135deg, #FF5722, #cc3a10); box-shadow: 0 4px 16px rgba(255,87,34,0.25); }
+  .lc-stat-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .lc-stat-label-default { color: #555; }
+  .lc-stat-label-accent  { color: rgba(255,255,255,0.75); }
+  .lc-stat-value { display: flex; align-items: baseline; gap: 4px; }
+  .lc-stat-num { font-size: 22px; font-family: 'DM Mono', monospace; font-weight: 500; line-height: 1.1; }
+  .lc-stat-num-default { color: #f0f0f0; }
+  .lc-stat-num-accent  { color: #fff; }
+  .lc-stat-unit { font-size: 12px; font-family: 'DM Mono', monospace; }
+  .lc-stat-unit-default { color: #555; }
+  .lc-stat-unit-accent  { color: rgba(255,255,255,0.7); }
+  .lc-stat-sub { font-size: 11px; font-family: 'DM Sans', sans-serif; }
+  .lc-stat-sub-default { color: #444; }
+  .lc-stat-sub-accent  { color: rgba(255,255,255,0.6); }
+
+  /* ── Warning ─────────────────────────────────────────────── */
+  .lc-warning {
+    background: linear-gradient(135deg, #8a4a2d, #6a3a1a);
+    color: #fff;
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    display: none;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .lc-warning strong { display: block; margin-bottom: 2px; font-size: 14px; }
+  .lc-warning-text  { font-size: 12px; opacity: .9; line-height: 1.4; }
+
+  /* ── Power bar ───────────────────────────────────────────── */
+  .lc-powerbar { display: flex; flex-direction: column; gap: 5px; }
+  .lc-powerbar-header { display: flex; justify-content: space-between; font-size: 10px; color: #555; }
+  .lc-powerbar-track  { height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
+  .lc-powerbar-fill   { height: 100%; border-radius: 3px; transition: width .5s ease; }
+
+  /* ── Material list ───────────────────────────────────────── */
+  .lc-material-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; background: #111; border-radius: 8px; border: 1px solid #222; }
+  .lc-material-label { font-size: 13px; display: flex; align-items: center; gap: 6px; color: #ccc; }
+  .lc-material-qty   { font-family: 'DM Mono', monospace; font-weight: 600; font-size: 15px; color: #FF5722; }
+
+  /* ── Note ────────────────────────────────────────────────── */
+  .lc-note { background: #111; border-radius: 10px; padding: 12px; border: 1px solid #2a2a2a; font-size: 11px; color: #555; line-height: 1.5; }
+
+  /* ── Mini stats ──────────────────────────────────────────── */
+  .lc-mini-stat { text-align: center; padding: 10px; background: #111; border-radius: 8px; border: 1px solid #222; }
+  .lc-mini-stat-val   { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 600; color: #FF5722; }
+  .lc-mini-stat-label { font-size: 9px; color: #555; font-weight: 700; letter-spacing: 1px; margin-top: 2px; }
+
+  /* ── Field label ─────────────────────────────────────────── */
+  .lc-field-col   { display: flex; flex-direction: column; gap: 4px; }
+  .lc-field-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #555; }
+
+  /* ── Print button ────────────────────────────────────────── */
+  .lc-btn-print {
+    background: linear-gradient(135deg, #FF5722, #cc3a10);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    letter-spacing: .5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 10px;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 4px 16px rgba(255,87,34,0.3);
+  }
+  .lc-btn-print:hover { opacity: .9; }
+
+  /* ── Tab content ─────────────────────────────────────────── */
+  .lc-tab-content { display: none; flex-direction: column; gap: 10px; }
+  .lc-tab-content.active { display: flex; }
+
+  /* ── Test pattern color btns ─────────────────────────────── */
+  .tp-color-btn { transition: transform .15s; }
+  .tp-color-btn:hover  { transform: scale(1.15); }
+  .tp-color-btn.active { border-color: #FF5722 !important; box-shadow: 0 0 0 2px rgba(255,87,34,.4) !important; }
+
+  /* ── Footer ──────────────────────────────────────────────── */
+  .app-footer {
+    text-align: center;
+    margin-top: 24px;
+    padding: 12px 0;
+    border-top: 1px solid #1f1f1f;
+  }
+  .app-footer span { font-size: 10px; color: #333; letter-spacing: 1px; }
+
+  /* ── PWA banners ─────────────────────────────────────────── */
+  #offline-banner {
+    display: none;
+    position: fixed;
+    top: env(safe-area-inset-top, 0);
+    left: 0; right: 0;
+    background: #b71c1c;
+    color: white;
+    text-align: center;
+    padding: 0.6rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    z-index: 9999;
+    font-family: 'DM Sans', sans-serif;
+  }
+  #offline-banner.show { display: block; }
+
+  #install-banner {
+    display: none;
+    position: fixed;
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(400px, calc(100vw - 2rem));
+    background: #1a1a1a;
+    border: 1px solid #FF5722;
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    z-index: 9998;
+    font-family: 'DM Sans', sans-serif;
+  }
+  #install-banner.show { display: block; }
+  .ib-row   { display: flex; align-items: center; gap: .75rem; }
+  .ib-icon  { font-size: 1.8rem; flex-shrink: 0; }
+  .ib-text strong { display: block; font-size: .9rem; color: #f0f0f0; }
+  .ib-text span   { font-size: .76rem; color: #555; }
+  .ib-btns  { display: flex; gap: .5rem; margin-top: .7rem; }
+  .ib-install { flex: 1; background: #FF5722; color: white; border: none; border-radius: 8px; padding: .55rem 1rem; font-weight: 700; font-size: .82rem; cursor: pointer; }
+  .ib-dismiss { background: transparent; color: #555; border: 1px solid #333; border-radius: 8px; padding: .55rem 1rem; font-size: .82rem; cursor: pointer; }
+
+  @media print { .no-print { display: none !important; } }
+
+  @media (max-width: 380px) {
+    .lc-grid-3 { grid-template-columns: 1fr 1fr; }
+    .lc-stat-num { font-size: 18px; }
+    .lc-tab { font-size: 9px; padding: 7px 2px; }
+  }
+</style>
 </head>
 <body>
 
-<div id="offline-banner">⚡ Sin conexión — la calculadora funciona igual offline</div>
+<div id="offline-banner">⚡ Sin conexión — funciona igual offline</div>
 
 <div id="install-banner">
   <div class="ib-row">
@@ -254,256 +385,673 @@
   </div>
 </div>
 
-<div class="app">
+<div id="app">
 
-  <div class="header">
-    <div class="header-logo">
+  <!-- Header -->
+  <div class="app-header no-print">
+    <div class="app-header-logo">
       <img src="./tlo-logo.png" alt="TLO Visual">
     </div>
-    <h1>🖥️ Calculadora de Pantallas LED</h1>
-    <p>Calculá la configuración ideal para tu evento en segundos</p>
+    <h1>Calculadora Técnica LED</h1>
+    <p>CALCULADORA TÉCNICA LEDSCREENS — TLO VISUAL</p>
   </div>
 
-  <div class="body">
-
-    <div class="section">
-      <h2 class="section-title">Datos de tu Proyecto</h2>
-
-      <div class="field">
-        <label>Ancho de la pantalla <span class="tip" title="Ancho aproximado que necesitás">?</span></label>
-        <div class="input-row">
-          <input type="number" id="width" value="10" step="0.5" min="0.5" inputmode="decimal" placeholder="Ej: 10">
-          <span class="unit">metros</span>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Alto de la pantalla <span class="tip" title="Alto aproximado que necesitás">?</span></label>
-        <div class="input-row">
-          <input type="number" id="height" value="6" step="0.5" min="0.5" inputmode="decimal" placeholder="Ej: 6">
-          <span class="unit">metros</span>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Distancia mínima de visualización <span class="tip" title="A qué distancia estará el público más cercano">?</span></label>
-        <div class="input-row">
-          <input type="number" id="distance" value="15" step="1" min="1" inputmode="decimal" placeholder="Ej: 15">
-          <span class="unit">metros</span>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Tipo de evento</label>
-        <select id="eventType">
-          <option value="indoor">Indoor (Interior)</option>
-          <option value="outdoor" selected>Outdoor (Exterior)</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Uso</label>
-        <select id="useType">
-          <option value="rental">Alquiler / Evento temporal</option>
-          <option value="fixed">Instalación fija</option>
-        </select>
-      </div>
-
-      <button class="calc-btn" onclick="calculate()">🧮 Calcular Configuración</button>
-    </div>
-
-    <div class="section">
-      <h2 class="section-title">Resultados</h2>
-
-      <div class="preview-wrap">
-        <div class="screen-box" id="screenBox" style="width:180px;height:108px;">10m × 6m</div>
-        <span class="dim-label dim-w" id="dimW">10.00m</span>
-        <span class="dim-label dim-h" id="dimH">6.00m</span>
-      </div>
-
-      <div class="card">
-        <h3>💎 Pitch Recomendado</h3>
-        <div class="card-value" id="pitchResult">—</div>
-        <div class="card-detail">Ideal para esta distancia de visualización</div>
-      </div>
-
-      <div class="card">
-        <h3>📐 Resolución Final</h3>
-        <div class="card-value" id="resolutionResult">—</div>
-        <div class="card-detail">Píxeles horizontales × verticales</div>
-      </div>
-
-      <div class="card">
-        <h3>🧩 Módulos Necesarios</h3>
-        <div class="card-value" id="modulesResult">—</div>
-        <div class="card-detail">Total de paneles (500×500 mm)</div>
-      </div>
-
-      <div class="card">
-        <h3>⚖️ Peso Aproximado</h3>
-        <div class="card-value" id="weightResult">—</div>
-        <div class="card-detail">Peso total de la configuración</div>
-      </div>
-
-      <div class="card">
-        <h3>⚡ Consumo Eléctrico</h3>
-        <div class="card-value" id="powerResult">—</div>
-        <div class="card-detail">Consumo máximo estimado</div>
-      </div>
-
-      <div class="recs">
-        <h3>✨ Recomendaciones</h3>
-        <ul id="recommendations">
-          <li><span class="check">✓</span> Completá los datos y presioná Calcular</li>
-        </ul>
-      </div>
-    </div>
-
+  <!-- Modelo de Cabinet -->
+  <div class="lc-card">
+    <div class="lc-section-label">🖥️ MODELO DE CABINET</div>
+    <select id="modelSelect" class="lc-select">
+      <option value="manual">Introducir datos manualmente</option>
+      <option value="pitch19" selected>Pitch 1.9mm — Indoor</option>
+      <option value="dicolor19">Dicolor US-191C 1.9mm — Curvo</option>
+      <option value="gloshine26">Gloshine MV Pro 2.6mm</option>
+      <option value="dicolor26">Dicolor US-261C 2.6mm — Curvo</option>
+      <option value="gloshine29">Gloshine 2.9mm</option>
+      <option value="gloshine39">Gloshine 3.9mm — Outdoor</option>
+    </select>
+    <div id="modelTags" class="lc-tags"></div>
   </div>
 
-  <div class="cta">
-    <div class="cta-logo">
-      <img src="./tlo-logo.png" alt="TLO Visual">
-    </div>
-    <p>¿Te interesa esta configuración? Consultanos para recibir un presupuesto personalizado</p>
-    <div class="cta-btns">
-      <a href="https://wa.me/34686514064" class="btn-cta" target="_blank" rel="noopener">📱 Consultar por WhatsApp</a>
-      <a href="mailto:info@tlovisual.com" class="btn-cta">📧 Enviar Email</a>
+  <!-- Manual -->
+  <div id="manualCard" class="lc-card fade-up" style="display:none">
+    <div class="lc-section-label">⚙️ DATOS DEL TILE</div>
+    <div class="lc-grid-2">
+      <div class="lc-stepper-group"><span class="lc-stepper-label">Ancho tile</span><div class="lc-stepper"><button type="button" data-target="manTileW" data-delta="-0.1">−</button><input type="number" id="manTileW" value="0.5" step="0.1"><span class="lc-stepper-unit">m</span><button type="button" data-target="manTileW" data-delta="0.1">+</button></div></div>
+      <div class="lc-stepper-group"><span class="lc-stepper-label">Alto tile</span><div class="lc-stepper"><button type="button" data-target="manTileH" data-delta="-0.1">−</button><input type="number" id="manTileH" value="0.5" step="0.1"><span class="lc-stepper-unit">m</span><button type="button" data-target="manTileH" data-delta="0.1">+</button></div></div>
+      <div class="lc-stepper-group"><span class="lc-stepper-label">Peso tile</span><div class="lc-stepper"><button type="button" data-target="manWeight" data-delta="-0.5">−</button><input type="number" id="manWeight" value="8" step="0.5"><span class="lc-stepper-unit">kg</span><button type="button" data-target="manWeight" data-delta="0.5">+</button></div></div>
+      <div class="lc-stepper-group"><span class="lc-stepper-label">Consumo máx</span><div class="lc-stepper"><button type="button" data-target="manPower" data-delta="-5">−</button><input type="number" id="manPower" value="165" step="5"><span class="lc-stepper-unit">W</span><button type="button" data-target="manPower" data-delta="5">+</button></div></div>
+      <div class="lc-stepper-group"><span class="lc-stepper-label">Consumo medio</span><div class="lc-stepper"><button type="button" data-target="manAvgPower" data-delta="-5">−</button><input type="number" id="manAvgPower" value="82" step="5"><span class="lc-stepper-unit">W</span><button type="button" data-target="manAvgPower" data-delta="5">+</button></div></div>
+      <div class="lc-stepper-group"><span class="lc-stepper-label">Peso bumper</span><div class="lc-stepper"><button type="button" data-target="manBumper" data-delta="-0.5">−</button><input type="number" id="manBumper" value="5.5" step="0.5"><span class="lc-stepper-unit">kg</span><button type="button" data-target="manBumper" data-delta="0.5">+</button></div></div>
+      <div class="lc-stepper-group"><span class="lc-stepper-label">Píxeles H</span><div class="lc-stepper"><button type="button" data-target="manPixH" data-delta="-1">−</button><input type="number" id="manPixH" value="192" step="1"><span class="lc-stepper-unit">px</span><button type="button" data-target="manPixH" data-delta="1">+</button></div></div>
+      <div class="lc-stepper-group"><span class="lc-stepper-label">Píxeles V</span><div class="lc-stepper"><button type="button" data-target="manPixV" data-delta="-1">−</button><input type="number" id="manPixV" value="192" step="1"><span class="lc-stepper-unit">px</span><button type="button" data-target="manPixV" data-delta="1">+</button></div></div>
     </div>
   </div>
 
+  <!-- Dimensiones -->
+  <div class="lc-card">
+    <div class="lc-section-label">📐 DIMENSIONES DE PANTALLA</div>
+    <div class="lc-grid-2">
+      <div class="lc-stepper-group"><span class="lc-stepper-label">↔ Ancho</span><div class="lc-stepper"><button type="button" data-target="screenW" data-delta="-0.5">−</button><input type="number" id="screenW" value="6" step="0.5"><span class="lc-stepper-unit">m</span><button type="button" data-target="screenW" data-delta="0.5">+</button></div></div>
+      <div class="lc-stepper-group"><span class="lc-stepper-label">↕ Alto</span><div class="lc-stepper"><button type="button" data-target="screenH" data-delta="-0.5">−</button><input type="number" id="screenH" value="3" step="0.5"><span class="lc-stepper-unit">m</span><button type="button" data-target="screenH" data-delta="0.5">+</button></div></div>
+    </div>
+  </div>
+
+  <!-- Eléctrica -->
+  <div class="lc-card">
+    <div class="lc-section-label">⚡ CONFIGURACIÓN ELÉCTRICA</div>
+    <div class="lc-grid-3">
+      <div class="lc-field-col"><span class="lc-field-label">TENSIÓN</span><select id="voltage" class="lc-select-sm"><option value="230">230V</option><option value="400">400V</option></select></div>
+      <div class="lc-field-col"><span class="lc-field-label">FASE</span><select id="phase" class="lc-select-sm"><option value="mono">Monofásico</option><option value="tri" selected>Trifásico</option></select></div>
+      <div class="lc-field-col"><span class="lc-field-label">AMPERAJE</span><select id="circuitAmps" class="lc-select-sm"><option value="16">16A</option><option value="20">20A</option><option value="32">32A</option><option value="63" selected>63A</option></select></div>
+    </div>
+  </div>
+
+  <!-- Resultados -->
+  <div id="resultsContainer">
+    <div id="warningBox" class="lc-warning">
+      <span style="font-size:20px">⚠️</span>
+      <div>
+        <strong>Altura &gt; 4.5m</strong>
+        <span class="lc-warning-text">Se desaconseja montaje con mecanotubo (truss/tubo/grapa). Emplear estructura de Layher para asegurar la pantalla y a los operarios en trabajo en altura.</span>
+      </div>
+    </div>
+
+    <div class="lc-tabs no-print" id="tabBar">
+      <button class="lc-tab active" data-tab="general"><span class="lc-tab-icon">📊</span>General</button>
+      <button class="lc-tab" data-tab="electrica"><span class="lc-tab-icon">⚡</span>Eléctrica</button>
+      <button class="lc-tab" data-tab="estructura"><span class="lc-tab-icon">🏗️</span>Estructura</button>
+      <button class="lc-tab" data-tab="preview"><span class="lc-tab-icon">👁️</span>Vista</button>
+      <button class="lc-tab" data-tab="testpattern"><span class="lc-tab-icon">🎯</span>Test</button>
+    </div>
+
+    <!-- General -->
+    <div id="tab-general" class="lc-tab-content active">
+      <div class="lc-grid-2">
+        <div class="lc-stat lc-stat-accent">
+          <span class="lc-stat-label lc-stat-label-accent">📐 Dimensiones reales</span>
+          <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-accent" id="r-dims"></span><span class="lc-stat-unit lc-stat-unit-accent">m</span></div>
+          <span class="lc-stat-sub lc-stat-sub-accent" id="r-tiles-info"></span>
+        </div>
+        <div class="lc-stat lc-stat-default">
+          <span class="lc-stat-label lc-stat-label-default">🖥️ Resolución total</span>
+          <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-res"></span><span class="lc-stat-unit lc-stat-unit-default">px</span></div>
+          <span class="lc-stat-sub lc-stat-sub-default" id="r-mpx"></span>
+        </div>
+      </div>
+      <div class="lc-grid-2">
+        <div class="lc-stat lc-stat-default">
+          <span class="lc-stat-label lc-stat-label-default">⚓ Peso total</span>
+          <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-weight"></span><span class="lc-stat-unit lc-stat-unit-default">kg</span></div>
+          <span class="lc-stat-sub lc-stat-sub-default" id="r-weight-detail"></span>
+        </div>
+        <div class="lc-stat lc-stat-default">
+          <span class="lc-stat-label lc-stat-label-default">📏 Superficie</span>
+          <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-area"></span><span class="lc-stat-unit lc-stat-unit-default">m²</span></div>
+          <span class="lc-stat-sub lc-stat-sub-default" id="r-diagonal"></span>
+        </div>
+      </div>
+      <div class="lc-grid-2">
+        <div class="lc-stat lc-stat-default">
+          <span class="lc-stat-label lc-stat-label-default">↔ Relación aspecto</span>
+          <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-ratio"></span><span class="lc-stat-unit lc-stat-unit-default">:1</span></div>
+        </div>
+        <div class="lc-stat lc-stat-default">
+          <span class="lc-stat-label lc-stat-label-default">👁️ Dist. mín. visionado</span>
+          <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-mindist"></span><span class="lc-stat-unit lc-stat-unit-default">m</span></div>
+          <span class="lc-stat-sub lc-stat-sub-default" id="r-pitch"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Eléctrica -->
+    <div id="tab-electrica" class="lc-tab-content">
+      <div class="lc-grid-2">
+        <div class="lc-stat lc-stat-accent">
+          <span class="lc-stat-label lc-stat-label-accent">⚡ Consumo máximo</span>
+          <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-accent" id="r-maxpower"></span><span class="lc-stat-unit lc-stat-unit-accent">W</span></div>
+          <span class="lc-stat-sub lc-stat-sub-accent" id="r-maxkw"></span>
+        </div>
+        <div class="lc-stat lc-stat-default">
+          <span class="lc-stat-label lc-stat-label-default">⚡ Consumo medio</span>
+          <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-avgpower"></span><span class="lc-stat-unit lc-stat-unit-default">W</span></div>
+          <span class="lc-stat-sub lc-stat-sub-default" id="r-avgkw"></span>
+        </div>
+      </div>
+      <div class="lc-card" style="margin-bottom:0">
+        <div class="lc-powerbar">
+          <div class="lc-powerbar-header"><span>Consumo medio vs máximo</span><span id="r-powerbar-text"></span></div>
+          <div class="lc-powerbar-track"><div class="lc-powerbar-fill" id="r-powerbar-fill"></div></div>
+        </div>
+      </div>
+      <div class="lc-grid-2">
+        <div class="lc-stat lc-stat-default">
+          <span class="lc-stat-label lc-stat-label-default">🔌 Circuitos (MÁX)</span>
+          <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-circuits-max"></span><span class="lc-stat-unit lc-stat-unit-default" id="r-circuits-max-unit"></span></div>
+          <span class="lc-stat-sub lc-stat-sub-default" id="r-circuits-max-sub"></span>
+        </div>
+        <div class="lc-stat lc-stat-default">
+          <span class="lc-stat-label lc-stat-label-default">🔌 Circuitos (MED)</span>
+          <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-circuits-avg"></span><span class="lc-stat-unit lc-stat-unit-default" id="r-circuits-avg-unit"></span></div>
+          <span class="lc-stat-sub lc-stat-sub-default">Con factor de carga 80%</span>
+        </div>
+      </div>
+      <div class="lc-note">💡 <strong>Nota:</strong> Factor de carga del 80% sobre capacidad nominal. Consumo medio según especificaciones del fabricante para contenido mixto.</div>
+    </div>
+
+    <!-- Estructura -->
+    <div id="tab-estructura" class="lc-tab-content">
+      <div class="lc-toggle" id="bumperToggle" style="margin-top:0;margin-bottom:10px">
+        <span class="lc-toggle-label">⚓ Incluir Bumpers en peso</span>
+        <div class="lc-toggle-track" id="bumperTrack" style="background:#FF5722">
+          <div class="lc-toggle-thumb" id="bumperThumb" style="transform:translateX(18px)"></div>
+        </div>
+      </div>
+      <div class="lc-stat lc-stat-accent">
+        <span class="lc-stat-label lc-stat-label-accent">⚓ Contrapeso total</span>
+        <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-accent" id="r-counterweight"></span><span class="lc-stat-unit lc-stat-unit-accent">kg</span></div>
+        <span class="lc-stat-sub lc-stat-sub-accent" id="r-cw-detail"></span>
+      </div>
+      <div class="lc-card" style="margin-bottom:0">
+        <div class="lc-section-label">🏗️ MATERIAL NECESARIO</div>
+        <div id="materialList" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+      <div class="lc-note">💡 <strong>Nota:</strong> Contrapesos para estructura de mecanotubo con ground support. Puntos cada 1.5m a lo largo del ancho.</div>
+    </div>
+
+    <!-- Preview -->
+    <div id="tab-preview" class="lc-tab-content">
+      <div class="lc-card" style="margin-bottom:0;padding:12px">
+        <canvas id="screenCanvas" style="width:100%;height:240px;border-radius:10px"></canvas>
+      </div>
+      <div class="lc-grid-3">
+        <div class="lc-mini-stat"><div class="lc-mini-stat-val" id="r-total-tiles"></div><div class="lc-mini-stat-label">TILES</div></div>
+        <div class="lc-mini-stat"><div class="lc-mini-stat-val" id="r-grid"></div><div class="lc-mini-stat-label">GRID</div></div>
+        <div class="lc-mini-stat"><div class="lc-mini-stat-val" id="r-area2"></div><div class="lc-mini-stat-label">M²</div></div>
+      </div>
+    </div>
+
+    <!-- Test Pattern -->
+    <div id="tab-testpattern" class="lc-tab-content">
+      <div class="lc-card">
+        <div class="lc-section-label">🎯 TEST PATTERN GENERATOR</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="lc-grid-2">
+            <div class="lc-stepper-group">
+              <span class="lc-stepper-label">Nombre</span>
+              <input type="text" id="tpName" value="TLO Visual" style="padding:10px 12px;border-radius:10px;border:1px solid #333;background:#111;font-size:13px;font-family:'DM Sans',sans-serif;color:#f0f0f0;outline:none;width:100%">
+            </div>
+            <div class="lc-stepper-group">
+              <span class="lc-stepper-label">Color Grid</span>
+              <div style="display:flex;gap:6px">
+                <button type="button" class="tp-color-btn" data-color="#ff0000" style="width:32px;height:32px;border-radius:8px;border:2px solid #333;background:#ff0000;cursor:pointer"></button>
+                <button type="button" class="tp-color-btn" data-color="#00ff00" style="width:32px;height:32px;border-radius:8px;border:2px solid #333;background:#00ff00;cursor:pointer"></button>
+                <button type="button" class="tp-color-btn" data-color="#ffffff" style="width:32px;height:32px;border-radius:8px;border:2px solid #333;background:#ffffff;cursor:pointer"></button>
+                <button type="button" class="tp-color-btn active" data-color="#FF5722" style="width:32px;height:32px;border-radius:8px;border:2px solid #FF5722;background:#FF5722;cursor:pointer"></button>
+                <button type="button" class="tp-color-btn" data-color="#0088ff" style="width:32px;height:32px;border-radius:8px;border:2px solid #333;background:#0088ff;cursor:pointer"></button>
+              </div>
+            </div>
+          </div>
+          <div class="lc-grid-3">
+            <div class="lc-toggle" id="tpGridToggle" style="margin-top:0">
+              <span class="lc-toggle-label" style="font-size:11px">Grid</span>
+              <div class="lc-toggle-track" id="tpGridTrack" style="background:#FF5722;width:36px;height:20px"><div class="lc-toggle-thumb" id="tpGridThumb" style="transform:translateX(16px);width:16px;height:16px;border-radius:8px"></div></div>
+            </div>
+            <div class="lc-toggle" id="tpCircleToggle" style="margin-top:0">
+              <span class="lc-toggle-label" style="font-size:11px">Círculos</span>
+              <div class="lc-toggle-track" id="tpCircleTrack" style="background:#FF5722;width:36px;height:20px"><div class="lc-toggle-thumb" id="tpCircleThumb" style="transform:translateX(16px);width:16px;height:16px;border-radius:8px"></div></div>
+            </div>
+            <div class="lc-toggle" id="tpNumbersToggle" style="margin-top:0">
+              <span class="lc-toggle-label" style="font-size:11px">Números</span>
+              <div class="lc-toggle-track" id="tpNumbersTrack" style="background:#FF5722;width:36px;height:20px"><div class="lc-toggle-thumb" id="tpNumbersThumb" style="transform:translateX(16px);width:16px;height:16px;border-radius:8px"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="lc-card" style="margin-bottom:0;padding:8px;background:#000">
+        <canvas id="tpCanvas" style="width:100%;height:280px;border-radius:8px;display:block"></canvas>
+      </div>
+      <div class="lc-stat lc-stat-default" style="margin-top:10px">
+        <span class="lc-stat-label lc-stat-label-default">📐 Resolución del test pattern</span>
+        <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="tp-res-info"></span><span class="lc-stat-unit lc-stat-unit-default">px</span></div>
+      </div>
+      <button type="button" id="tpDownloadBtn" style="width:100%;padding:14px;background:linear-gradient(135deg,#FF5722,#cc3a10);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;margin-top:10px;letter-spacing:0.5px;box-shadow:0 4px 16px rgba(255,87,34,0.3)">
+        ⬇️ Descargar Test Pattern (PNG resolución real)
+      </button>
+      <div class="lc-note" style="margin-top:10px">💡 <strong>Nota:</strong> El pattern se genera a la resolución real de la pantalla. Para pantallas muy grandes (&gt;8K), la descarga puede tardar unos segundos.</div>
+    </div>
+  </div>
+
+  <button type="button" class="lc-btn-print no-print" onclick="window._printLedReport()">🖨️ Imprimir Informe</button>
+
+  <a href="https://wa.me/34686514064" target="_blank" rel="noopener" class="no-print" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:10px;padding:14px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:.5px;text-decoration:none;box-shadow:0 4px 16px rgba(37,211,102,0.3);">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Consultar por WhatsApp
+  </a>
+
+  <div class="app-footer">
+    <span>TLO VISUAL © 2026 — CALCULADORA TÉCNICA LED</span>
+  </div>
 </div>
 
 <script>
-  const SCREENS = {
-    indoor: {
-      p2_5: { pitch:2.5, moduleSize:0.5, weight:8,   power:800 },
-      p3:   { pitch:3.0, moduleSize:0.5, weight:7.5, power:700 },
-      p3_9: { pitch:3.9, moduleSize:0.5, weight:7,   power:650 }
-    },
-    outdoor: {
-      p4:   { pitch:4.0, moduleSize:0.5, weight:9,   power:850 },
-      p4_8: { pitch:4.8, moduleSize:0.5, weight:8.5, power:800 },
-      p5:   { pitch:5.0, moduleSize:0.5, weight:8,   power:750 },
-      p6:   { pitch:6.0, moduleSize:0.5, weight:7.5, power:700 }
+(function() {
+  var MODELS = {
+    pitch19:    { tileW:0.5, tileH:0.5, weight:8.3, power:165, avgPower:82,  pixH:256, pixV:256, bumper:5.5, ip:'IP30 Indoor' },
+    gloshine26: { tileW:0.5, tileH:0.5, weight:9,   power:165, avgPower:82,  pixH:192, pixV:192, bumper:5.5, ip:'IP30 Indoor' },
+    gloshine29: { tileW:0.5, tileH:0.5, weight:8,   power:200, avgPower:100, pixH:168, pixV:168, bumper:5.5, ip:'IP30 Indoor' },
+    gloshine39: { tileW:0.5, tileH:0.5, weight:8.8, power:200, avgPower:100, pixH:128, pixV:128, bumper:6,   ip:'IP65 Outdoor' },
+    dicolor26:  { tileW:0.5, tileH:0.5, weight:8.5, power:140, avgPower:47,  pixH:192, pixV:192, bumper:5.5, ip:'IP40/IP21 Indoor', curve:true },
+    dicolor19:  { tileW:0.5, tileH:0.5, weight:8.5, power:130, avgPower:44,  pixH:256, pixV:256, bumper:5.5, ip:'IP40/IP21 Indoor', curve:true }
+  };
+  var useBumpers = true;
+
+  function el(id) { return document.getElementById(id); }
+  function fnum(n, d) { d = d !== undefined ? d : 1; return n.toLocaleString('es-ES', {minimumFractionDigits:d, maximumFractionDigits:d}); }
+
+  // Stepper
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('button[data-target]');
+    if (btn) {
+      e.preventDefault();
+      var target = el(btn.getAttribute('data-target'));
+      var delta  = parseFloat(btn.getAttribute('data-delta'));
+      var v = Math.round(((parseFloat(target.value) || 0) + delta) * 1000) / 1000;
+      if (v < 0) v = 0;
+      target.value = v;
+      recalc();
     }
+  });
+
+  document.querySelectorAll('.lc-stepper input').forEach(function(i) { i.addEventListener('input', recalc); });
+  el('modelSelect').addEventListener('change', function() { el('manualCard').style.display = this.value === 'manual' ? 'block' : 'none'; updateTags(); recalc(); });
+  el('voltage').addEventListener('change', recalc);
+  el('phase').addEventListener('change', recalc);
+  el('circuitAmps').addEventListener('change', recalc);
+
+  el('bumperToggle').addEventListener('click', function() {
+    useBumpers = !useBumpers;
+    el('bumperTrack').style.background = useBumpers ? '#FF5722' : '#333';
+    el('bumperThumb').style.transform  = useBumpers ? 'translateX(18px)' : 'translateX(0)';
+    recalc();
+  });
+
+  el('tabBar').addEventListener('click', function(e) {
+    var tab = e.target.closest('.lc-tab');
+    if (!tab) return;
+    var tabName = tab.getAttribute('data-tab');
+    document.querySelectorAll('.lc-tab').forEach(function(t) { t.classList.remove('active'); });
+    tab.classList.add('active');
+    document.querySelectorAll('.lc-tab-content').forEach(function(c) { c.classList.remove('active'); });
+    el('tab-' + tabName).classList.add('active');
+    if (tabName === 'preview') drawCanvas();
+    if (tabName === 'testpattern') drawTestPatternPreview();
+  });
+
+  function updateTags() {
+    var model = el('modelSelect').value;
+    var container = el('modelTags');
+    if (model === 'manual') { container.innerHTML = ''; return; }
+    var m = MODELS[model];
+    container.innerHTML =
+      '<span class="lc-tag lc-tag-green">' + m.ip + '</span>' +
+      '<span class="lc-tag lc-tag-blue">' + m.pixH + '×' + m.pixV + ' px/tile</span>' +
+      '<span class="lc-tag lc-tag-yellow">' + m.weight + ' kg/tile</span>' +
+      '<span class="lc-tag lc-tag-purple">' + m.power + ' W max</span>' +
+      (m.curve ? '<span class="lc-tag lc-tag-green">Curvo ±45°</span>' : '');
+  }
+
+  function getParams() {
+    var model = el('modelSelect').value;
+    if (model === 'manual') {
+      return {
+        tileW: parseFloat(el('manTileW').value) || 0.5,
+        tileH: parseFloat(el('manTileH').value) || 0.5,
+        weight: parseFloat(el('manWeight').value) || 8,
+        power: parseFloat(el('manPower').value) || 165,
+        avgPower: parseFloat(el('manAvgPower').value) || 82,
+        pixH: parseInt(el('manPixH').value) || 192,
+        pixV: parseInt(el('manPixV').value) || 192,
+        bumper: parseFloat(el('manBumper').value) || 5.5
+      };
+    }
+    return MODELS[model];
+  }
+
+  function recalc() {
+    var p = getParams();
+    var screenW = parseFloat(el('screenW').value) || 0;
+    var screenH = parseFloat(el('screenH').value) || 0;
+    if (!screenW || !screenH || !p.tileW || !p.tileH) return;
+
+    var tilesH = Math.ceil(screenW / p.tileW);
+    var tilesV = Math.ceil(screenH / p.tileH);
+    var totalTiles = tilesH * tilesV;
+    var realW = tilesH * p.tileW;
+    var realH = tilesV * p.tileH;
+
+    var cabWeight  = totalTiles * p.weight;
+    var bmpWeight  = useBumpers ? tilesH * p.bumper : 0;
+    var totalWeight = cabWeight + bmpWeight;
+    var maxPower   = totalTiles * p.power;
+    var avgPower   = totalTiles * p.avgPower;
+    var totalPixH  = tilesH * p.pixH;
+    var totalPixV  = tilesV * p.pixV;
+
+    var cwPoints = Math.ceil(realW / 1.5);
+    var tippingMoment = totalWeight * (realH / 2);
+    var cw = Math.round((tippingMoment * 0.8 * 0.8) / 5) * 5;
+    var cwPerPoint = Math.ceil(cw / cwPoints);
+    var trussH = Math.ceil((realH - 0.5) / 0.5) * 0.5;
+    var tubes = Math.ceil(trussH / 1.5) * cwPoints;
+    var clamps = tubes * 2;
+    var butterflies = Math.ceil(realW * realH);
+
+    var voltage = parseInt(el('voltage').value);
+    var phase = el('phase').value;
+    var amps = parseInt(el('circuitAmps').value);
+    var circuitPower = phase === 'mono' ? voltage * amps : voltage * amps * Math.sqrt(3);
+    var usablePower = circuitPower * 0.8;
+    var circuitsMax = Math.ceil(maxPower / usablePower);
+    var circuitsAvg = Math.ceil(avgPower / usablePower);
+
+    var area = realW * realH;
+    var diag = Math.sqrt(realW * realW + realH * realH);
+    var diagInch = diag * 39.3701;
+    var ratio = (realW / realH).toFixed(2);
+    var pitch = (p.tileW / p.pixH) * 1000;
+    var minDist = pitch * 1.5;
+
+    el('warningBox').style.display = realH > 4.5 ? 'flex' : 'none';
+
+    el('r-dims').textContent       = realW.toFixed(1) + ' × ' + realH.toFixed(1);
+    el('r-tiles-info').textContent = tilesH + ' × ' + tilesV + ' = ' + totalTiles + ' tiles';
+    el('r-res').textContent        = totalPixH.toLocaleString() + ' × ' + totalPixV.toLocaleString();
+    el('r-mpx').textContent        = '~' + (totalPixH * totalPixV / 1e6).toFixed(1) + ' Mpx';
+    el('r-weight').textContent     = fnum(totalWeight, 1);
+    el('r-weight-detail').textContent = useBumpers ? 'Cabinets: ' + fnum(cabWeight, 0) + ' + Bumpers: ' + fnum(bmpWeight, 0) : 'Sin bumpers';
+    el('r-area').textContent       = fnum(area, 1);
+    el('r-diagonal').textContent   = 'Diagonal: ' + fnum(diag, 1) + 'm (' + fnum(diagInch, 0) + '")';
+    el('r-ratio').textContent      = ratio;
+    el('r-mindist').textContent    = fnum(minDist, 1);
+    el('r-pitch').textContent      = 'Pitch ≈ ' + fnum(pitch, 1) + 'mm';
+
+    el('r-maxpower').textContent   = fnum(maxPower, 0);
+    el('r-maxkw').textContent      = (maxPower / 1000).toFixed(2) + ' kW';
+    el('r-avgpower').textContent   = fnum(avgPower, 0);
+    el('r-avgkw').textContent      = (avgPower / 1000).toFixed(2) + ' kW (~' + ((avgPower / maxPower) * 100).toFixed(0) + '%)';
+    el('r-powerbar-text').textContent = fnum(avgPower, 0) + ' W / ' + fnum(maxPower, 0) + ' W';
+
+    var pct = Math.min((avgPower / maxPower) * 100, 100);
+    var bar = el('r-powerbar-fill');
+    bar.style.width = pct + '%';
+    bar.style.background = pct > 80 ? 'linear-gradient(90deg,#c44,#e55)' : 'linear-gradient(90deg,#FF5722,#FF8A50)';
+
+    var phaseLabel = phase === 'tri' ? '3F' : '1F';
+    el('r-circuits-max').textContent      = circuitsMax;
+    el('r-circuits-max-unit').textContent = '× ' + amps + 'A ' + phaseLabel;
+    el('r-circuits-max-sub').textContent  = 'Cap: ' + fnum(usablePower, 0) + 'W útiles';
+    el('r-circuits-avg').textContent      = circuitsAvg;
+    el('r-circuits-avg-unit').textContent = '× ' + amps + 'A ' + phaseLabel;
+
+    el('r-counterweight').textContent = fnum(cw, 0);
+    el('r-cw-detail').textContent     = cwPoints + ' puntos × ' + cwPerPoint + ' kg/punto';
+
+    var materials = [
+      { icon:'🧱', label:'Planchas contrapeso',               qty: cwPoints },
+      { icon:'📏', label:'Truss vertical (' + trussH.toFixed(1) + 'm)', qty: cwPoints },
+      { icon:'🔧', label:'Tubos horizontales (2m)',            qty: tubes },
+      { icon:'🔩', label:'Grapas dobles',                      qty: clamps },
+      { icon:'🦋', label:'Mariposas + grapa',                  qty: butterflies }
+    ];
+    el('materialList').innerHTML = materials.map(function(m) {
+      return '<div class="lc-material-row"><span class="lc-material-label"><span>' + m.icon + '</span> ' + m.label + '</span><span class="lc-material-qty">' + m.qty + '</span></div>';
+    }).join('');
+
+    el('r-total-tiles').textContent = totalTiles;
+    el('r-grid').textContent        = tilesH + ' × ' + tilesV;
+    el('r-area2').textContent       = fnum(area, 1);
+
+    window._lcd = { tilesH:tilesH, tilesV:tilesV, tileW:p.tileW, tileH:p.tileH, realW:realW, realH:realH };
+    if (el('tab-preview').classList.contains('active')) drawCanvas();
+  }
+
+  function drawCanvas() {
+    var d = window._lcd; if (!d) return;
+    var canvas = el('screenCanvas');
+    var ctx = canvas.getContext('2d');
+    var dpr = window.devicePixelRatio || 1;
+    var rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    var w = rect.width, h = rect.height;
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = '#111'; ctx.fillRect(0,0,w,h);
+    var pad = 44;
+    var scale = Math.min((w - pad*2) / d.realW, (h - pad*2) / d.realH);
+    var rW = d.realW * scale, rH = d.realH * scale;
+    var sX = (w - rW) / 2, sY = (h - rH) / 2;
+    ctx.shadowColor = 'rgba(255,87,34,0.2)'; ctx.shadowBlur = 20; ctx.shadowOffsetY = 6;
+    ctx.fillStyle = '#1a1a1a'; ctx.fillRect(sX, sY, rW, rH);
+    ctx.shadowColor = 'transparent';
+    for (var i = 0; i < d.tilesH; i++) {
+      for (var j = 0; j < d.tilesV; j++) {
+        var tx = sX + i * d.tileW * scale, ty = sY + j * d.tileH * scale;
+        var tw = d.tileW * scale, th = d.tileH * scale;
+        ctx.fillStyle = 'hsl(' + (20 + (i+j)*3) + ',40%,' + (12 + ((i+j)%3)*3) + '%)';
+        ctx.fillRect(tx+.5, ty+.5, tw-1, th-1);
+        ctx.strokeStyle = 'rgba(255,87,34,0.15)'; ctx.lineWidth = .5;
+        ctx.strokeRect(tx+.5, ty+.5, tw-1, th-1);
+      }
+    }
+    ctx.strokeStyle = '#FF5722'; ctx.lineWidth = 1; ctx.setLineDash([3,2]);
+    var dimY = sY + rH + 20;
+    ctx.beginPath(); ctx.moveTo(sX, dimY); ctx.lineTo(sX+rW, dimY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sX, dimY-4); ctx.lineTo(sX, dimY+4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sX+rW, dimY-4); ctx.lineTo(sX+rW, dimY+4); ctx.stroke();
+    var dimX = sX - 20;
+    ctx.beginPath(); ctx.moveTo(dimX, sY); ctx.lineTo(dimX, sY+rH); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(dimX-4, sY); ctx.lineTo(dimX+4, sY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(dimX-4, sY+rH); ctx.lineTo(dimX+4, sY+rH); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#FF5722'; ctx.font = '500 12px DM Mono, monospace'; ctx.textAlign = 'center';
+    ctx.fillText(d.realW.toFixed(1) + 'm', sX + rW/2, dimY+15);
+    ctx.save(); ctx.translate(dimX-12, sY+rH/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText(d.realH.toFixed(1) + 'm', 0, 0); ctx.restore();
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.font = '500 10px DM Mono, monospace'; ctx.textAlign = 'center';
+    ctx.fillText(d.tilesH + ' × ' + d.tilesV + ' tiles', sX+rW/2, sY+rH/2+4);
+  }
+
+  // === Test Pattern ===
+  var tpGridColor = '#FF5722', tpShowGrid = true, tpShowCircles = true, tpShowNumbers = true;
+
+  document.querySelectorAll('.tp-color-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.tp-color-btn').forEach(function(b) { b.classList.remove('active'); b.style.borderColor = '#333'; });
+      this.classList.add('active'); this.style.borderColor = '#FF5722';
+      tpGridColor = this.getAttribute('data-color');
+      drawTestPatternPreview();
+    });
+  });
+
+  function setupTpToggle(toggleId, trackId, thumbId, getter, setter) {
+    el(toggleId).addEventListener('click', function() {
+      var v = !getter(); setter(v);
+      el(trackId).style.background = v ? '#FF5722' : '#333';
+      el(thumbId).style.transform = v ? 'translateX(16px)' : 'translateX(0)';
+      drawTestPatternPreview();
+    });
+  }
+  setupTpToggle('tpGridToggle','tpGridTrack','tpGridThumb', function(){return tpShowGrid}, function(v){tpShowGrid=v});
+  setupTpToggle('tpCircleToggle','tpCircleTrack','tpCircleThumb', function(){return tpShowCircles}, function(v){tpShowCircles=v});
+  setupTpToggle('tpNumbersToggle','tpNumbersTrack','tpNumbersThumb', function(){return tpShowNumbers}, function(v){tpShowNumbers=v});
+  el('tpName').addEventListener('input', function() { drawTestPatternPreview(); });
+
+  function drawTestPattern(ctx, w, h, isPreview) {
+    var name = el('tpName').value || 'TLO Visual';
+    var d = window._lcd;
+    var tilesH = d ? d.tilesH : 12, tilesV = d ? d.tilesV : 6;
+    ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
+    var fontSize = isPreview ? 12 : Math.max(16, Math.round(h/50));
+    var smallFont = isPreview ? 9 : Math.max(12, Math.round(h/70));
+    var tinyFont  = isPreview ? 7 : Math.max(10, Math.round(h/90));
+    var lineW = isPreview ? 0.5 : Math.max(1, Math.round(h/500));
+    var thickLine = isPreview ? 1 : Math.max(2, Math.round(h/300));
+    var cx = w/2, cy = h/2;
+    if (tpShowGrid) {
+      ctx.strokeStyle = tpGridColor; ctx.lineWidth = lineW; ctx.globalAlpha = 0.7;
+      for (var i = 0; i <= tilesH; i++) { var x=(i/tilesH)*w; ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+      for (var j = 0; j <= tilesV; j++) { var y=(j/tilesV)*h; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+      ctx.globalAlpha = 1; ctx.strokeStyle = tpGridColor; ctx.lineWidth = thickLine;
+      ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,h); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(w,cy); ctx.stroke();
+      var crossSize = isPreview ? 20 : Math.round(h/10);
+      var corners = [[0,0],[w,0],[0,h],[w,h]], labels = ['A','B','C','D'];
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = thickLine;
+      for (var c = 0; c < 4; c++) {
+        var px=corners[c][0], py=corners[c][1];
+        ctx.beginPath(); ctx.moveTo(px-crossSize,py); ctx.lineTo(px+crossSize,py); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px,py-crossSize); ctx.lineTo(px,py+crossSize); ctx.stroke();
+        ctx.fillStyle='#fff'; ctx.font='bold '+fontSize+'px DM Mono,monospace';
+        ctx.textAlign = c%2===0?'left':'right'; ctx.textBaseline = c<2?'top':'bottom';
+        ctx.fillText(labels[c], px+(c%2===0?crossSize*0.5:-crossSize*0.5), py+(c<2?crossSize*0.5:-crossSize*0.5));
+      }
+    }
+    if (tpShowCircles) {
+      ctx.strokeStyle = tpGridColor; ctx.lineWidth = lineW; ctx.globalAlpha = 0.5;
+      var maxR = Math.min(cx,cy);
+      for (var r=1; r<=5; r++) { ctx.beginPath(); ctx.arc(cx,cy,(maxR/5)*r,0,Math.PI*2); ctx.stroke(); }
+      ctx.globalAlpha=0.8; ctx.lineWidth=thickLine;
+      ctx.beginPath(); ctx.arc(cx,cy,maxR*0.98,0,Math.PI*2); ctx.stroke();
+      ctx.globalAlpha=1; ctx.fillStyle=tpGridColor;
+      ctx.beginPath(); ctx.arc(cx,cy,isPreview?3:Math.max(4,Math.round(h/100)),0,Math.PI*2); ctx.fill();
+    }
+    if (tpShowNumbers) {
+      ctx.fillStyle='#fff'; ctx.font=tinyFont+'px DM Mono,monospace'; ctx.globalAlpha=0.6;
+      var margin=isPreview?6:Math.round(h/60);
+      ctx.textAlign='center';
+      for (var i=0;i<tilesH;i++) { var x=((i+0.5)/tilesH)*w; var num=i-Math.floor(tilesH/2); if(tilesH%2===0&&num>=0)num++; var lbl=(num>0?'+':'')+num; ctx.textBaseline='top'; ctx.fillText(lbl,x,margin); ctx.textBaseline='bottom'; ctx.fillText(lbl,x,h-margin); }
+      ctx.textBaseline='middle';
+      for (var j=0;j<tilesV;j++) { var y=((j+0.5)/tilesV)*h; var num=j-Math.floor(tilesV/2); if(tilesV%2===0&&num>=0)num++; var lbl=(num>0?'+':'')+num; ctx.textAlign='left'; ctx.fillText(lbl,margin,y); ctx.textAlign='right'; ctx.fillText(lbl,w-margin,y); }
+      ctx.globalAlpha=1;
+    }
+    ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.font='bold '+(isPreview?14:Math.round(h/25))+'px DM Sans,sans-serif';
+    ctx.fillText(name, cx, cy-(isPreview?28:h*0.07));
+    ctx.font=(isPreview?11:Math.round(h/35))+'px DM Mono,monospace';
+    ctx.fillText(w+'px × '+h+'px', cx, cy+(isPreview?8:h*0.02));
+    ctx.globalAlpha=0.6; ctx.font=(isPreview?9:Math.round(h/45))+'px DM Mono,monospace';
+    ctx.fillText((w/h).toFixed(2)+':1', cx, cy+(isPreview?22:h*0.055));
+    ctx.fillText(tilesH+' × '+tilesV+' tiles', cx, cy+(isPreview?35:h*0.09));
+    ctx.globalAlpha=1;
+  }
+
+  function drawTestPatternPreview() {
+    var d = window._lcd; if (!d) return;
+    var canvas = el('tpCanvas');
+    var dpr = window.devicePixelRatio||1;
+    var rect = canvas.getBoundingClientRect();
+    canvas.width=rect.width*dpr; canvas.height=rect.height*dpr;
+    var ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+    drawTestPattern(ctx, rect.width, rect.height, true);
+    el('tp-res-info').textContent = (d.tilesH*getParams().pixH)+' × '+(d.tilesV*getParams().pixV);
+  }
+
+  el('tpDownloadBtn').addEventListener('click', function() {
+    var d=window._lcd; if(!d) return;
+    var p=getParams(); var fullW=d.tilesH*p.pixH, fullH=d.tilesV*p.pixV;
+    var maxDim=16384, scale=1;
+    if(fullW>maxDim||fullH>maxDim) { scale=Math.min(maxDim/fullW,maxDim/fullH); fullW=Math.round(fullW*scale); fullH=Math.round(fullH*scale); }
+    var off=document.createElement('canvas'); off.width=fullW; off.height=fullH;
+    drawTestPattern(off.getContext('2d'), fullW, fullH, false);
+    var link=document.createElement('a'); link.download='testpattern_'+fullW+'x'+fullH+'.png';
+    off.toBlob(function(blob){ link.href=URL.createObjectURL(blob); link.click(); URL.revokeObjectURL(link.href); },'image/png');
+  });
+
+  updateTags();
+  recalc();
+
+  // === Print Report ===
+  window._printLedReport = function() {
+    var d=window._lcd; if(!d) return;
+    var p=getParams();
+    var model=el('modelSelect'); var modelName=model.options[model.selectedIndex].text;
+    var totalTiles=d.tilesH*d.tilesV, totalPixH=d.tilesH*p.pixH, totalPixV=d.tilesV*p.pixV;
+    var area=d.realW*d.realH, diag=Math.sqrt(d.realW*d.realW+d.realH*d.realH), diagInch=diag*39.3701;
+    var pitch=(p.tileW/p.pixH)*1000, minDist=pitch*1.5, ratio=(d.realW/d.realH).toFixed(2);
+    var cabWeight=totalTiles*p.weight, bmpWeight=useBumpers?d.tilesH*p.bumper:0, totalWeight=cabWeight+bmpWeight;
+    var maxPower=totalTiles*p.power, avgPower=totalTiles*p.avgPower;
+    var voltage=parseInt(el('voltage').value), phase=el('phase').value, amps=parseInt(el('circuitAmps').value);
+    var circuitPower=phase==='mono'?voltage*amps:voltage*amps*Math.sqrt(3);
+    var usablePower=circuitPower*0.8, circuitsMax=Math.ceil(maxPower/usablePower), circuitsAvg=Math.ceil(avgPower/usablePower);
+    var phaseLabel=phase==='tri'?'Trifásico':'Monofásico';
+    var cwPoints=Math.ceil(d.realW/1.5), tippingMoment=totalWeight*(d.realH/2);
+    var cw=Math.round((tippingMoment*0.8*0.8)/5)*5, cwPerPoint=Math.ceil(cw/cwPoints);
+    var trussH=Math.ceil((d.realH-0.5)/0.5)*0.5, tubes=Math.ceil(trussH/1.5)*cwPoints;
+    var clamps=tubes*2, butterflies=Math.ceil(d.realW*d.realH);
+    var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>';
+    html+='body{font-family:Arial,sans-serif;padding:30px 40px;color:#333;max-width:820px;margin:0 auto}';
+    html+='h1{font-size:16px;border-bottom:2px solid #FF5722;padding-bottom:6px;color:#FF5722;margin-bottom:14px}';
+    html+='h2{font-size:12px;color:#FF5722;margin:16px 0 6px;text-transform:uppercase;letter-spacing:1px;border-left:3px solid #FF5722;padding-left:8px}';
+    html+='table{width:100%;border-collapse:collapse;margin:0 0 10px}td,th{padding:5px 10px;border:1px solid #ddd;font-size:12px}';
+    html+='th{background:#fff5f2;font-weight:600;width:38%;text-align:left}.big{font-size:14px;font-weight:700;color:#FF5722}';
+    html+='.footer{margin-top:20px;font-size:9px;color:#999;text-align:center;border-top:1px solid #eee;padding-top:6px}';
+    html+='</style></head><body>';
+    html+='<h1>INFORME LED SCREEN — TLO VISUAL</h1>';
+    html+='<h2>🖥️ Modelo de Cabinet</h2><table>';
+    html+='<tr><th>Modelo</th><td class="big">'+modelName+'</td></tr>';
+    html+='<tr><th>Dimensiones tile</th><td>'+p.tileW+' × '+p.tileH+' m</td></tr>';
+    html+='<tr><th>Píxeles por tile</th><td>'+p.pixH+' × '+p.pixV+' px</td></tr>';
+    html+='<tr><th>Pixel Pitch</th><td>'+pitch.toFixed(2)+' mm</td></tr>';
+    html+='<tr><th>Peso por tile</th><td>'+p.weight+' kg</td></tr>';
+    html+='<tr><th>Consumo por tile</th><td>'+p.power+' W máx / '+p.avgPower+' W medio</td></tr></table>';
+    html+='<h2>📐 Pantalla</h2><table>';
+    html+='<tr><th>Dimensiones reales</th><td class="big">'+d.realW.toFixed(1)+' m × '+d.realH.toFixed(1)+' m</td></tr>';
+    html+='<tr><th>Superficie</th><td>'+area.toFixed(1)+' m²</td></tr>';
+    html+='<tr><th>Diagonal</th><td>'+diag.toFixed(1)+' m ('+diagInch.toFixed(0)+'")</td></tr>';
+    html+='<tr><th>Aspect Ratio</th><td>'+ratio+':1</td></tr>';
+    html+='<tr><th>Layout tiles</th><td class="big">'+d.tilesH+' × '+d.tilesV+' = '+totalTiles+' tiles</td></tr>';
+    html+='<tr><th>Resolución total</th><td class="big">'+totalPixH.toLocaleString()+' × '+totalPixV.toLocaleString()+' px (~'+(totalPixH*totalPixV/1e6).toFixed(1)+' Mpx)</td></tr>';
+    html+='<tr><th>Dist. mínima visionado</th><td>'+minDist.toFixed(1)+' m</td></tr></table>';
+    if(d.realH>4.5) html+='<div style="background:#fce4ec;color:#c62828;padding:6px 10px;border-radius:3px;margin:8px 0;font-size:11px;font-weight:600">⚠️ Altura > 4.5m — Se desaconseja montaje con mecanotubo. Emplear estructura Layher.</div>';
+    html+='<h2>⚓ Peso</h2><table>';
+    html+='<tr><th>Peso cabinets</th><td>'+cabWeight.toFixed(1)+' kg ('+totalTiles+' × '+p.weight+' kg)</td></tr>';
+    html+='<tr><th>Peso bumpers</th><td>'+(useBumpers?bmpWeight.toFixed(1)+' kg ('+d.tilesH+' × '+p.bumper+' kg)':'No incluidos')+'</td></tr>';
+    html+='<tr><th>Peso total</th><td class="big">'+totalWeight.toFixed(1)+' kg</td></tr></table>';
+    html+='<h2>⚡ Eléctrica</h2><table>';
+    html+='<tr><th>Consumo máximo</th><td class="big">'+maxPower.toFixed(0)+' W ('+(maxPower/1000).toFixed(2)+' kW)</td></tr>';
+    html+='<tr><th>Consumo medio</th><td>'+avgPower.toFixed(0)+' W ('+(avgPower/1000).toFixed(2)+' kW) ~'+((avgPower/maxPower)*100).toFixed(0)+'%</td></tr>';
+    html+='<tr><th>Configuración</th><td>'+voltage+'V '+phaseLabel+' / '+amps+'A</td></tr>';
+    html+='<tr><th>Circuitos (máx consumo)</th><td class="big">'+circuitsMax+' × '+amps+'A</td></tr>';
+    html+='<tr><th>Circuitos (consumo medio)</th><td>'+circuitsAvg+' × '+amps+'A</td></tr></table>';
+    html+='<h2>⚓ Contrapeso</h2><table>';
+    html+='<tr><th>Contrapeso total</th><td class="big">'+cw+' kg</td></tr>';
+    html+='<tr><th>Puntos de apoyo</th><td>'+cwPoints+' puntos × '+cwPerPoint+' kg/punto</td></tr></table>';
+    html+='<div class="footer">Generado por TLO Visual — '+new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})+'</div>';
+    html+='</body></html>';
+    var win=window.open('','_blank'); win.document.write(html); win.document.close();
+    setTimeout(function(){win.print();},400);
   };
 
-  function calculate() {
-    const width    = parseFloat(document.getElementById('width').value);
-    const height   = parseFloat(document.getElementById('height').value);
-    const distance = parseFloat(document.getElementById('distance').value);
-    const type     = document.getElementById('eventType').value;
-
-    if (!width || !height || !distance || width <= 0 || height <= 0 || distance <= 0) {
-      alert('Completá todos los campos con valores válidos');
-      return;
-    }
-
-    const pitchMin = distance * 0.25;
-    const avail    = SCREENS[type];
-
-    let sel = null, selName = '';
-    for (const [k, v] of Object.entries(avail)) {
-      if (v.pitch >= pitchMin && v.pitch <= distance * 0.35) { sel = v; selName = k; break; }
-    }
-    if (!sel) {
-      const best = Object.entries(avail).reduce((p, c) =>
-        Math.abs(c[1].pitch - pitchMin) < Math.abs(p[1].pitch - pitchMin) ? c : p);
-      sel = best[1]; selName = best[0];
-    }
-
-    const label = selName.toUpperCase().replace('_', '.');
-    const ms    = sel.moduleSize;
-    const mX    = Math.ceil(width  / ms);
-    const mY    = Math.ceil(height / ms);
-    const tot   = mX * mY;
-    const fw    = parseFloat((mX * ms).toFixed(2));
-    const fh    = parseFloat((mY * ms).toFixed(2));
-    const dens  = 1000 / sel.pitch;
-
-    document.getElementById('pitchResult').textContent      = label;
-    document.getElementById('resolutionResult').textContent = Math.round(fw*dens) + ' × ' + Math.round(fh*dens) + ' px';
-    document.getElementById('modulesResult').textContent    = mX + ' × ' + mY + ' = ' + tot;
-    document.getElementById('weightResult').textContent     = Math.round(tot * sel.weight) + ' kg';
-    document.getElementById('powerResult').textContent      = (tot * sel.power / 1000).toFixed(1) + ' kW';
-
-    updatePreview(fw, fh);
-    document.getElementById('dimW').textContent = fw + 'm';
-    document.getElementById('dimH').textContent = fh + 'm';
-    updateRecs(label, distance, type, tot);
-  }
-
-  function updatePreview(w, h) {
-    const box = document.getElementById('screenBox');
-    const r = w / h;
-    let bw, bh;
-    if (r > 1.67) { bw = 220; bh = 220 / r; }
-    else          { bh = 130; bw = 130 * r; }
-    box.style.width  = Math.round(bw) + 'px';
-    box.style.height = Math.round(bh) + 'px';
-    box.textContent  = w + 'm × ' + h + 'm';
-  }
-
-  function updateRecs(pitch, dist, type, modules) {
-    const list = [
-      'Pantalla ' + pitch + ' ' + (type==='outdoor'?'Outdoor':'Indoor') + ' es ideal para esta distancia',
-      dist < 5 ? 'Excelente definición para eventos corporativos y presentaciones'
-               : dist < 15 ? 'Perfecta para conciertos medianos y eventos sociales'
-                           : 'Ideal para conciertos grandes y festivales al aire libre',
-      modules < 100 ? 'Configuración ligera, montaje rápido (2-3 horas)'
-                    : modules < 200 ? 'Requiere estructura de soporte tipo truss o ground support'
-                                    : 'Requiere estructura reforzada y equipo técnico especializado',
-      type==='outdoor' ? 'Recomendamos sistema de protección contra lluvia (IP65)'
-                       : 'Sistema con control de brillo automático para interiores'
-    ];
-    document.getElementById('recommendations').innerHTML =
-      list.map(r => '<li><span class="check">✓</span> ' + r + '</li>').join('');
-  }
-
-  ['width','height','distance','eventType','useType'].forEach(function(id) {
-    var el = document.getElementById(id);
-    el.addEventListener('input',  calculate);
-    el.addEventListener('change', calculate);
-  });
-
-  calculate();
-
+  // === PWA ===
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(function(){});
 
-  function syncOnline() {
-    document.getElementById('offline-banner').classList.toggle('show', !navigator.onLine);
-  }
-  window.addEventListener('online', syncOnline);
-  window.addEventListener('offline', syncOnline);
-  syncOnline();
+  function syncOnline() { document.getElementById('offline-banner').classList.toggle('show', !navigator.onLine); }
+  window.addEventListener('online', syncOnline); window.addEventListener('offline', syncOnline); syncOnline();
 
-  var deferredPrompt = null;
-  var installBanner  = document.getElementById('install-banner');
-
+  var deferredPrompt=null, installBanner=document.getElementById('install-banner');
   window.addEventListener('beforeinstallprompt', function(e) {
-    e.preventDefault(); deferredPrompt = e;
-    if (!localStorage.getItem('pwa-dismissed'))
-      setTimeout(function(){ installBanner.classList.add('show'); }, 2500);
+    e.preventDefault(); deferredPrompt=e;
+    if (!localStorage.getItem('pwa-dismissed')) setTimeout(function(){installBanner.classList.add('show');}, 2500);
   });
-
   document.getElementById('btn-install').addEventListener('click', function() {
     if (!deferredPrompt) return;
-    installBanner.classList.remove('show');
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(function(){ deferredPrompt = null; });
+    installBanner.classList.remove('show'); deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(){deferredPrompt=null;});
   });
-
   document.getElementById('btn-dismiss').addEventListener('click', function() {
-    installBanner.classList.remove('show');
-    localStorage.setItem('pwa-dismissed','1');
+    installBanner.classList.remove('show'); localStorage.setItem('pwa-dismissed','1');
   });
-
-  window.addEventListener('appinstalled', function() {
-    installBanner.classList.remove('show');
-    deferredPrompt = null;
-  });
+  window.addEventListener('appinstalled', function() { installBanner.classList.remove('show'); deferredPrompt=null; });
+})();
 </script>
-
 </body>
 </html>
