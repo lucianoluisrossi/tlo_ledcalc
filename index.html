@@ -406,12 +406,21 @@
     <div class="lc-section-label">🖥️ MODELO DE CABINET</div>
     <select id="modelSelect" class="lc-select">
       <option value="manual">Introducir datos manualmente</option>
-      <option value="pitch19" selected>Pitch 1.9mm — Indoor</option>
-      <option value="dicolor19">Dicolor US-191C 1.9mm — Curvo</option>
-      <option value="gloshine26">Gloshine MV Pro 2.6mm</option>
-      <option value="dicolor26">Dicolor US-261C 2.6mm — Curvo</option>
-      <option value="gloshine29">Gloshine 2.9mm</option>
-      <option value="gloshine39">Gloshine 3.9mm — Outdoor</option>
+      <option value="p26_lite_curvo" selected>Módulo P2.6 Lite Curvo</option>
+      <option value="p26_lite_recto">Módulo P2.6 Lite Recto</option>
+      <option value="dicolor_flex_p26">Módulo Flexible Dicolor P2.6</option>
+      <option value="dicolor_rigid_p26">Módulo Rígido Dicolor P2.6</option>
+      <option value="mrl_flex_p26">Módulo P2.6 Flexible MRL</option>
+      <option value="mrl_curvo_p26">Módulo P2.6 MRL Curvo</option>
+      <option value="mrl_recto_p26">Módulo P2.6 Recta MRL-TLO</option>
+      <option value="db_curvo_p19">Módulo P1.9 Dual Black Curvo</option>
+      <option value="db_flex_p19">Módulo P1.9 Dual Black Flexible</option>
+      <option value="db_recto_p19">Módulo P1.9 Dual Black Recto</option>
+      <option value="gwr_p19">Módulo P1.9 GWR</option>
+      <option value="p23">Módulo P2.3</option>
+      <option value="translucido_ut390">Módulo Translúcido UT-390</option>
+      <option value="p39_500x1000">Módulo P3.9 (500×1000)</option>
+      <option value="p39_500x500">Módulo P3.9 (500×500)</option>
     </select>
     <div id="modelTags" class="lc-tags"></div>
   </div>
@@ -640,12 +649,21 @@
 <script>
 (function() {
   var MODELS = {
-    pitch19:    { tileW:0.5, tileH:0.5, weight:8.3, power:165, avgPower:82,  pixH:256, pixV:256, bumper:5.5, ip:'IP30 Indoor' },
-    gloshine26: { tileW:0.5, tileH:0.5, weight:9,   power:165, avgPower:82,  pixH:192, pixV:192, bumper:5.5, ip:'IP30 Indoor' },
-    gloshine29: { tileW:0.5, tileH:0.5, weight:8,   power:200, avgPower:100, pixH:168, pixV:168, bumper:5.5, ip:'IP30 Indoor' },
-    gloshine39: { tileW:0.5, tileH:0.5, weight:8.8, power:200, avgPower:100, pixH:128, pixV:128, bumper:6,   ip:'IP65 Outdoor' },
-    dicolor26:  { tileW:0.5, tileH:0.5, weight:8.5, power:140, avgPower:47,  pixH:192, pixV:192, bumper:5.5, ip:'IP40/IP21 Indoor', curve:true },
-    dicolor19:  { tileW:0.5, tileH:0.5, weight:8.5, power:130, avgPower:44,  pixH:256, pixV:256, bumper:5.5, ip:'IP40/IP21 Indoor', curve:true }
+    p26_lite_curvo:   { tileW:0.5, tileH:0.5, weight:5.9,  power:490, avgPower:170, pixH:192, pixV:192, bumper:5.5, curve:true },
+    p26_lite_recto:   { tileW:0.5, tileH:0.5, weight:5.9,  power:490, avgPower:170, pixH:192, pixV:192, bumper:5.5 },
+    dicolor_flex_p26: { tileW:0.5, tileH:0.5, weight:8.5,  power:456, avgPower:114, pixH:192, pixV:192, bumper:5.5, curve:true },
+    dicolor_rigid_p26:{ tileW:0.5, tileH:0.5, weight:7.8,  power:492, avgPower:123, pixH:192, pixV:192, bumper:5.5, curve:true },
+    mrl_flex_p26:     { tileW:0.5, tileH:0.5, weight:8.3,  power:580, avgPower:196, pixH:192, pixV:192, bumper:5.5, curve:true },
+    mrl_curvo_p26:    { tileW:0.5, tileH:0.5, weight:7.4,  power:580, avgPower:196, pixH:192, pixV:192, bumper:5.5, curve:true },
+    mrl_recto_p26:    { tileW:0.5, tileH:0.5, weight:7.4,  power:580, avgPower:196, pixH:192, pixV:192, bumper:5.5 },
+    db_curvo_p19:     { tileW:0.5, tileH:0.5, weight:7.53, power:580, avgPower:195, pixH:256, pixV:256, bumper:5.5, curve:true },
+    db_flex_p19:      { tileW:0.5, tileH:0.5, weight:7.53, power:530, avgPower:180, pixH:256, pixV:256, bumper:5.5, curve:true },
+    db_recto_p19:     { tileW:0.5, tileH:0.5, weight:7.28, power:580, avgPower:195, pixH:256, pixV:256, bumper:5.5 },
+    gwr_p19:          { tileW:0.5, tileH:0.5, weight:7.7,  power:450, avgPower:150, pixH:256, pixV:256, bumper:5.5, curve:true },
+    p23:              { tileW:0.5, tileH:0.5, weight:8.3,  power:454, avgPower:151, pixH:210, pixV:210, bumper:5.5, curve:true },
+    translucido_ut390:{ tileW:1.0, tileH:0.5, weight:6.5,  power:416, avgPower:139, pixH:256, pixV:64,  bumper:5.5, curve:true },
+    p39_500x1000:     { tileW:0.5, tileH:1.0, weight:11.6, power:512, avgPower:128, pixH:128, pixV:256, bumper:5.5, curve:true },
+    p39_500x500:      { tileW:0.5, tileH:0.5, weight:8.0,  power:512, avgPower:128, pixH:128, pixV:128, bumper:5.5, curve:true }
   };
   var useBumpers = true;
 
@@ -697,7 +715,7 @@
     if (model === 'manual') { container.innerHTML = ''; return; }
     var m = MODELS[model];
     container.innerHTML =
-      '<span class="lc-tag lc-tag-green">' + m.ip + '</span>' +
+      (m.ip ? '<span class="lc-tag lc-tag-green">' + m.ip + '</span>' : '') +
       '<span class="lc-tag lc-tag-blue">' + m.pixH + '×' + m.pixV + ' px/tile</span>' +
       '<span class="lc-tag lc-tag-yellow">' + m.weight + ' kg/tile</span>' +
       '<span class="lc-tag lc-tag-purple">' + m.power + ' W max</span>' +
