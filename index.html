@@ -790,7 +790,7 @@
     el('r-res').textContent        = totalPixH.toLocaleString() + ' × ' + totalPixV.toLocaleString();
     el('r-mpx').textContent        = '~' + (totalPixH * totalPixV / 1e6).toFixed(1) + ' Mpx';
     el('r-weight').textContent     = fnum(totalWeight, 1);
-    el('r-weight-detail').textContent = useBumpers ? 'Cabinets: ' + fnum(cabWeight, 0) + ' + Bumpers: ' + fnum(bmpWeight, 0) : 'Sin bumpers';
+    el('r-weight-detail').textContent = useBumpers ? totalTiles + ' tiles · ' + fnum(cabWeight, 0) + ' kg + Bumpers: ' + fnum(bmpWeight, 0) + ' kg' : totalTiles + ' tiles · ' + fnum(cabWeight, 0) + ' kg (sin bumpers)';
     el('r-area').textContent       = fnum(area, 1);
     el('r-diagonal').textContent   = 'Diagonal: ' + fnum(diag, 1) + 'm (' + fnum(diagInch, 0) + '")';
     el('r-ratio').textContent      = ratio;
