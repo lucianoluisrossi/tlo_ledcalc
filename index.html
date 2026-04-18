@@ -427,11 +427,11 @@
 
   <!-- Manual -->
   <div id="manualCard" class="lc-card fade-up" style="display:none">
-    <div class="lc-section-label">⚙️ DATOS DEL TILE</div>
+    <div class="lc-section-label">⚙️ DATOS DEL MÓDULO</div>
     <div class="lc-grid-2">
-      <div class="lc-stepper-group"><span class="lc-stepper-label">Ancho tile</span><div class="lc-stepper"><button type="button" data-target="manTileW" data-delta="-0.1">−</button><input type="number" id="manTileW" value="0.5" step="0.1"><span class="lc-stepper-unit">m</span><button type="button" data-target="manTileW" data-delta="0.1">+</button></div></div>
-      <div class="lc-stepper-group"><span class="lc-stepper-label">Alto tile</span><div class="lc-stepper"><button type="button" data-target="manTileH" data-delta="-0.1">−</button><input type="number" id="manTileH" value="0.5" step="0.1"><span class="lc-stepper-unit">m</span><button type="button" data-target="manTileH" data-delta="0.1">+</button></div></div>
-      <div class="lc-stepper-group"><span class="lc-stepper-label">Peso tile</span><div class="lc-stepper"><button type="button" data-target="manWeight" data-delta="-0.5">−</button><input type="number" id="manWeight" value="8" step="0.5"><span class="lc-stepper-unit">kg</span><button type="button" data-target="manWeight" data-delta="0.5">+</button></div></div>
+      <div class="lc-stepper-group"><span class="lc-stepper-label">Ancho módulo</span><div class="lc-stepper"><button type="button" data-target="manTileW" data-delta="-0.1">−</button><input type="number" id="manTileW" value="0.5" step="0.1"><span class="lc-stepper-unit">m</span><button type="button" data-target="manTileW" data-delta="0.1">+</button></div></div>
+      <div class="lc-stepper-group"><span class="lc-stepper-label">Alto módulo</span><div class="lc-stepper"><button type="button" data-target="manTileH" data-delta="-0.1">−</button><input type="number" id="manTileH" value="0.5" step="0.1"><span class="lc-stepper-unit">m</span><button type="button" data-target="manTileH" data-delta="0.1">+</button></div></div>
+      <div class="lc-stepper-group"><span class="lc-stepper-label">Peso módulo</span><div class="lc-stepper"><button type="button" data-target="manWeight" data-delta="-0.5">−</button><input type="number" id="manWeight" value="8" step="0.5"><span class="lc-stepper-unit">kg</span><button type="button" data-target="manWeight" data-delta="0.5">+</button></div></div>
       <div class="lc-stepper-group"><span class="lc-stepper-label">Consumo máx</span><div class="lc-stepper"><button type="button" data-target="manPower" data-delta="-5">−</button><input type="number" id="manPower" value="165" step="5"><span class="lc-stepper-unit">W</span><button type="button" data-target="manPower" data-delta="5">+</button></div></div>
       <div class="lc-stepper-group"><span class="lc-stepper-label">Consumo medio</span><div class="lc-stepper"><button type="button" data-target="manAvgPower" data-delta="-5">−</button><input type="number" id="manAvgPower" value="82" step="5"><span class="lc-stepper-unit">W</span><button type="button" data-target="manAvgPower" data-delta="5">+</button></div></div>
       <div class="lc-stepper-group"><span class="lc-stepper-label">Peso bumper</span><div class="lc-stepper"><button type="button" data-target="manBumper" data-delta="-0.5">−</button><input type="number" id="manBumper" value="5.5" step="0.5"><span class="lc-stepper-unit">kg</span><button type="button" data-target="manBumper" data-delta="0.5">+</button></div></div>
@@ -577,7 +577,7 @@
         <canvas id="screenCanvas" style="width:100%;height:240px;border-radius:10px"></canvas>
       </div>
       <div class="lc-grid-3">
-        <div class="lc-mini-stat"><div class="lc-mini-stat-val" id="r-total-tiles"></div><div class="lc-mini-stat-label">TILES</div></div>
+        <div class="lc-mini-stat"><div class="lc-mini-stat-val" id="r-total-tiles"></div><div class="lc-mini-stat-label">MÓDULOS</div></div>
         <div class="lc-mini-stat"><div class="lc-mini-stat-val" id="r-grid"></div><div class="lc-mini-stat-label">GRID</div></div>
         <div class="lc-mini-stat"><div class="lc-mini-stat-val" id="r-area2"></div><div class="lc-mini-stat-label">M²</div></div>
       </div>
@@ -716,8 +716,8 @@
     var m = MODELS[model];
     container.innerHTML =
       (m.ip ? '<span class="lc-tag lc-tag-green">' + m.ip + '</span>' : '') +
-      '<span class="lc-tag lc-tag-blue">' + m.pixH + '×' + m.pixV + ' px/tile</span>' +
-      '<span class="lc-tag lc-tag-yellow">' + m.weight + ' kg/tile</span>' +
+      '<span class="lc-tag lc-tag-blue">' + m.pixH + '×' + m.pixV + ' px/módulo</span>' +
+      '<span class="lc-tag lc-tag-yellow">' + m.weight + ' kg/módulo</span>' +
       '<span class="lc-tag lc-tag-purple">' + m.power + ' W max</span>' +
       (m.curve ? '<span class="lc-tag lc-tag-green">Curvo ±45°</span>' : '');
   }
@@ -786,11 +786,11 @@
     el('warningBox').style.display = realH > 4.5 ? 'flex' : 'none';
 
     el('r-dims').textContent       = realW.toFixed(1) + ' × ' + realH.toFixed(1);
-    el('r-tiles-info').textContent = tilesH + ' × ' + tilesV + ' = ' + totalTiles + ' tiles';
+    el('r-tiles-info').textContent = tilesH + ' × ' + tilesV + ' = ' + totalTiles + ' módulos';
     el('r-res').textContent        = totalPixH.toLocaleString() + ' × ' + totalPixV.toLocaleString();
     el('r-mpx').textContent        = '~' + (totalPixH * totalPixV / 1e6).toFixed(1) + ' Mpx';
     el('r-weight').textContent     = fnum(totalWeight, 1);
-    el('r-weight-detail').textContent = useBumpers ? totalTiles + ' tiles · ' + fnum(cabWeight, 0) + ' kg + Bumpers: ' + fnum(bmpWeight, 0) + ' kg' : totalTiles + ' tiles · ' + fnum(cabWeight, 0) + ' kg (sin bumpers)';
+    el('r-weight-detail').textContent = useBumpers ? totalTiles + ' módulos · ' + fnum(cabWeight, 0) + ' kg + Bumpers: ' + fnum(bmpWeight, 0) + ' kg' : totalTiles + ' módulos · ' + fnum(cabWeight, 0) + ' kg (sin bumpers)';
     el('r-area').textContent       = fnum(area, 1);
     el('r-diagonal').textContent   = 'Diagonal: ' + fnum(diag, 1) + 'm (' + fnum(diagInch, 0) + '")';
     el('r-ratio').textContent      = ratio;
@@ -880,7 +880,7 @@
     ctx.save(); ctx.translate(dimX-12, sY+rH/2); ctx.rotate(-Math.PI/2);
     ctx.fillText(d.realH.toFixed(1) + 'm', 0, 0); ctx.restore();
     ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.font = '500 10px DM Mono, monospace'; ctx.textAlign = 'center';
-    ctx.fillText(d.tilesH + ' × ' + d.tilesV + ' tiles', sX+rW/2, sY+rH/2+4);
+    ctx.fillText(d.tilesH + ' × ' + d.tilesV + ' módulos', sX+rW/2, sY+rH/2+4);
   }
 
   // === Test Pattern ===
@@ -963,7 +963,7 @@
     ctx.fillText(w+'px × '+h+'px', cx, cy+(isPreview?8:h*0.02));
     ctx.globalAlpha=0.6; ctx.font=(isPreview?9:Math.round(h/45))+'px DM Mono,monospace';
     ctx.fillText((w/h).toFixed(2)+':1', cx, cy+(isPreview?22:h*0.055));
-    ctx.fillText(tilesH+' × '+tilesV+' tiles', cx, cy+(isPreview?35:h*0.09));
+    ctx.fillText(tilesH+' × '+tilesV+' módulos', cx, cy+(isPreview?35:h*0.09));
     ctx.globalAlpha=1;
   }
 
@@ -1021,17 +1021,17 @@
     html+='<h1>INFORME LED SCREEN — TLO VISUAL</h1>';
     html+='<h2>🖥️ Modelo de Cabinet</h2><table>';
     html+='<tr><th>Modelo</th><td class="big">'+modelName+'</td></tr>';
-    html+='<tr><th>Dimensiones tile</th><td>'+p.tileW+' × '+p.tileH+' m</td></tr>';
-    html+='<tr><th>Píxeles por tile</th><td>'+p.pixH+' × '+p.pixV+' px</td></tr>';
+    html+='<tr><th>Dimensiones módulo</th><td>'+p.tileW+' × '+p.tileH+' m</td></tr>';
+    html+='<tr><th>Píxeles por módulo</th><td>'+p.pixH+' × '+p.pixV+' px</td></tr>';
     html+='<tr><th>Pixel Pitch</th><td>'+pitch.toFixed(2)+' mm</td></tr>';
-    html+='<tr><th>Peso por tile</th><td>'+p.weight+' kg</td></tr>';
-    html+='<tr><th>Consumo por tile</th><td>'+p.power+' W máx / '+p.avgPower+' W medio</td></tr></table>';
+    html+='<tr><th>Peso por módulo</th><td>'+p.weight+' kg</td></tr>';
+    html+='<tr><th>Consumo por módulo</th><td>'+p.power+' W máx / '+p.avgPower+' W medio</td></tr></table>';
     html+='<h2>📐 Pantalla</h2><table>';
     html+='<tr><th>Dimensiones reales</th><td class="big">'+d.realW.toFixed(1)+' m × '+d.realH.toFixed(1)+' m</td></tr>';
     html+='<tr><th>Superficie</th><td>'+area.toFixed(1)+' m²</td></tr>';
     html+='<tr><th>Diagonal</th><td>'+diag.toFixed(1)+' m ('+diagInch.toFixed(0)+'")</td></tr>';
     html+='<tr><th>Aspect Ratio</th><td>'+ratio+':1</td></tr>';
-    html+='<tr><th>Layout tiles</th><td class="big">'+d.tilesH+' × '+d.tilesV+' = '+totalTiles+' tiles</td></tr>';
+    html+='<tr><th>Layout módulos</th><td class="big">'+d.tilesH+' × '+d.tilesV+' = '+totalTiles+' módulos</td></tr>';
     html+='<tr><th>Resolución total</th><td class="big">'+totalPixH.toLocaleString()+' × '+totalPixV.toLocaleString()+' px (~'+(totalPixH*totalPixV/1e6).toFixed(1)+' Mpx)</td></tr>';
     html+='<tr><th>Dist. mínima visionado</th><td>'+minDist.toFixed(1)+' m</td></tr></table>';
     if(d.realH>4.5) html+='<div style="background:#fce4ec;color:#c62828;padding:6px 10px;border-radius:3px;margin:8px 0;font-size:11px;font-weight:600">⚠️ Altura > 4.5m — Se desaconseja montaje con mecanotubo. Emplear estructura Layher.</div>';
