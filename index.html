@@ -768,8 +768,8 @@
     var trussH  = Math.ceil((realH - 0.5) / 0.5) * 0.5;
     var hUnits  = Math.round(trussH / 0.5);
     var tr2     = Math.floor(hUnits / 4); hUnits -= tr2 * 4;
-    var tr1     = Math.floor(hUnits / 2); hUnits -= tr1 * 2;
-    var tr05    = hUnits;
+    var tr15    = Math.floor(hUnits / 3); hUnits -= tr15 * 3;
+    var tr1     = Math.ceil(hUnits / 2);
     var tubes   = Math.ceil(trussH / 1.5) * cwPoints;
     var clamps  = tubes * 2;
     var butterflies = Math.ceil(realW * realH);
@@ -827,8 +827,8 @@
     var materials = [
       { icon:'🧱', label:'Planchas contrapeso 14kg',  qty: cwPoints * cwPlates14 },
       tr2  > 0 ? { icon:'📏', label:'Truss vertical 2m',   qty: tr2  * cwPoints } : null,
+      tr15 > 0 ? { icon:'📏', label:'Truss vertical 1.5m', qty: tr15 * cwPoints } : null,
       tr1  > 0 ? { icon:'📏', label:'Truss vertical 1m',   qty: tr1  * cwPoints } : null,
-      tr05 > 0 ? { icon:'📏', label:'Truss vertical 0.5m', qty: tr05 * cwPoints } : null,
       { icon:'🔧', label:'Tubos horizontales (2m)',   qty: tubes },
       { icon:'🔩', label:'Grapas dobles',              qty: clamps },
       { icon:'🦋', label:'Mariposas + grapa',          qty: butterflies }
@@ -1018,7 +1018,7 @@
     var wBases=15*cwPoints, cw=Math.max(0,Math.round(((totalWeight*0.22-wBases*0.90/2)/0.90*1.5)/5)*5);
     var cwPerPoint=Math.ceil(cw/cwPoints), cwPlates14=Math.ceil(cwPerPoint/14);
     var trussH=Math.ceil((d.realH-0.5)/0.5)*0.5;
-    var hU=Math.round(trussH/0.5), rtr2=Math.floor(hU/4); hU-=rtr2*4; var rtr1=Math.floor(hU/2); hU-=rtr1*2; var rtr05=hU;
+    var hU=Math.round(trussH/0.5), rtr2=Math.floor(hU/4); hU-=rtr2*4; var rtr15=Math.floor(hU/3); hU-=rtr15*3; var rtr1=Math.ceil(hU/2);
     var tubes=Math.ceil(trussH/1.5)*cwPoints, clamps=tubes*2, butterflies=Math.ceil(d.realW*d.realH);
     var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>';
     html+='body{font-family:Arial,sans-serif;padding:30px 40px;color:#333;max-width:820px;margin:0 auto}';
@@ -1059,9 +1059,9 @@
     html+='<tr><th>Contrapeso total</th><td class="big">'+cw+' kg (FS 1.5)</td></tr>';
     html+='<tr><th>Bases</th><td>'+cwPoints+' bases · '+cwPerPoint+' kg/base ('+cwPlates14+' planchas 14kg c/u)</td></tr>';
     html+='<tr><th>Planchas contrapeso 14kg</th><td>'+(cwPoints*cwPlates14)+'</td></tr>';
-    if(rtr2>0) html+='<tr><th>Truss vertical 2m</th><td>'+(rtr2*cwPoints)+'</td></tr>';
-    if(rtr1>0) html+='<tr><th>Truss vertical 1m</th><td>'+(rtr1*cwPoints)+'</td></tr>';
-    if(rtr05>0) html+='<tr><th>Truss vertical 0.5m</th><td>'+(rtr05*cwPoints)+'</td></tr>';
+    if(rtr2>0)  html+='<tr><th>Truss vertical 2m</th><td>'+(rtr2*cwPoints)+'</td></tr>';
+    if(rtr15>0) html+='<tr><th>Truss vertical 1.5m</th><td>'+(rtr15*cwPoints)+'</td></tr>';
+    if(rtr1>0)  html+='<tr><th>Truss vertical 1m</th><td>'+(rtr1*cwPoints)+'</td></tr>';
     html+='<tr><th>Tubos horizontales 2m</th><td>'+tubes+'</td></tr>';
     html+='<tr><th>Grapas dobles</th><td>'+clamps+'</td></tr>';
     html+='<tr><th>Mariposas + grapa</th><td>'+butterflies+'</td></tr></table>';
