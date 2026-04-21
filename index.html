@@ -759,10 +759,12 @@
     var totalPixH  = tilesH * p.pixH;
     var totalPixV  = tilesV * p.pixV;
 
-    var cwPoints = Math.ceil(realW / 1.5);
-    var tippingMoment = totalWeight * (realH / 2);
-    var cw = Math.round((tippingMoment * 0.8 * 0.8) / 5) * 5;
+    var cwPoints   = Math.ceil(realW / 2);
+    var d = 0.22, L = 0.90, wBaseUnit = 15, FS = 1.5;
+    var wBases     = wBaseUnit * cwPoints;
+    var cw         = Math.max(0, Math.round(((totalWeight * d - wBases * L / 2) / L * FS) / 5) * 5);
     var cwPerPoint = Math.ceil(cw / cwPoints);
+    var cwPlates14 = Math.ceil(cwPerPoint / 14);
     var trussH = Math.ceil((realH - 0.5) / 0.5) * 0.5;
     var tubes = Math.ceil(trussH / 1.5) * cwPoints;
     var clamps = tubes * 2;
@@ -816,10 +818,10 @@
     el('r-circuits-avg-unit').textContent = '× ' + amps + 'A ' + phaseLabel;
 
     el('r-counterweight').textContent = fnum(cw, 0);
-    el('r-cw-detail').textContent     = cwPoints + ' puntos × ' + cwPerPoint + ' kg/punto';
+    el('r-cw-detail').textContent     = cwPoints + ' bases · ' + cwPerPoint + ' kg/base (' + cwPlates14 + ' planchas 14kg c/u)';
 
     var materials = [
-      { icon:'🧱', label:'Planchas contrapeso',               qty: cwPoints },
+      { icon:'🧱', label:'Planchas contrapeso 14kg',           qty: cwPoints * cwPlates14 },
       { icon:'📏', label:'Truss vertical (' + trussH.toFixed(1) + 'm)', qty: cwPoints },
       { icon:'🔧', label:'Tubos horizontales (2m)',            qty: tubes },
       { icon:'🔩', label:'Grapas dobles',                      qty: clamps },
@@ -1006,8 +1008,9 @@
     var circuitPower=phase==='mono'?voltage*amps:voltage*amps*Math.sqrt(3);
     var usablePower=circuitPower*0.8, circuitsMax=Math.ceil(maxPower/usablePower), circuitsAvg=Math.ceil(avgPower/usablePower);
     var phaseLabel=phase==='tri'?'Trifásico':'Monofásico';
-    var cwPoints=Math.ceil(d.realW/1.5), tippingMoment=totalWeight*(d.realH/2);
-    var cw=Math.round((tippingMoment*0.8*0.8)/5)*5, cwPerPoint=Math.ceil(cw/cwPoints);
+    var cwPoints=Math.ceil(d.realW/2);
+    var wBases=15*cwPoints, cw=Math.max(0,Math.round(((totalWeight*0.22-wBases*0.90/2)/0.90*1.5)/5)*5);
+    var cwPerPoint=Math.ceil(cw/cwPoints), cwPlates14=Math.ceil(cwPerPoint/14);
     var trussH=Math.ceil((d.realH-0.5)/0.5)*0.5, tubes=Math.ceil(trussH/1.5)*cwPoints;
     var clamps=tubes*2, butterflies=Math.ceil(d.realW*d.realH);
     var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>';
@@ -1046,8 +1049,8 @@
     html+='<tr><th>Circuitos (máx consumo)</th><td class="big">'+circuitsMax+' × '+amps+'A</td></tr>';
     html+='<tr><th>Circuitos (consumo medio)</th><td>'+circuitsAvg+' × '+amps+'A</td></tr></table>';
     html+='<h2>⚓ Contrapeso</h2><table>';
-    html+='<tr><th>Contrapeso total</th><td class="big">'+cw+' kg</td></tr>';
-    html+='<tr><th>Puntos de apoyo</th><td>'+cwPoints+' puntos × '+cwPerPoint+' kg/punto</td></tr></table>';
+    html+='<tr><th>Contrapeso total</th><td class="big">'+cw+' kg (FS 1.5)</td></tr>';
+    html+='<tr><th>Bases</th><td>'+cwPoints+' bases · '+cwPerPoint+' kg/base ('+cwPlates14+' planchas 14kg c/u)</td></tr></table>';
     html+='<div class="footer">Generado por TLO Visual — '+new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})+'</div>';
     html+='</body></html>';
     var win=window.open('','_blank'); win.document.write(html); win.document.close();
