@@ -10,7 +10,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>Calculadora LED — TLO Visual</title>
 <link rel="manifest" href="./manifest.json">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -18,14 +20,50 @@
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   input[type=number] { -moz-appearance: textfield; }
+
+  :root {
+    --primary-black: #050506;
+    --primary-orange: #FF5722;
+    --accent-secondary: #FF8A50;
+    --bg-deep: #020203;
+    --bg-base: #0a0a0f;
+    --white: #EDEDEF;
+    --light-gray: #B4B8BF;
+    --medium-gray: #8A8F98;
+    --surface: rgba(255,255,255,0.04);
+    --hairline: rgba(255,255,255,0.08);
+    --accent-glow: rgba(255,87,34,0.25);
+    --accent-glow-strong: rgba(255,87,34,0.45);
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
   @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-  .fade-up { animation: fadeUp .35s ease-out forwards; }
+  .fade-up { animation: fadeUp .4s var(--ease) forwards; }
+
+  @keyframes driftA { from { transform: translate(0,0); } to { transform: translate(-50px, 50px); } }
+  @keyframes driftB { from { transform: translate(0,0); } to { transform: translate(50px, -40px); } }
+
+  /* ── Ambient glow ────────────────────────────────────────── */
+  .ambient-glow { position: fixed; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 0; }
+  .ambient-glow-1 {
+    width: 60vw; height: 60vw; max-width: 560px; max-height: 560px;
+    top: -15%; right: -15%;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    animation: driftA 24s var(--ease) infinite alternate;
+  }
+  .ambient-glow-2 {
+    width: 55vw; height: 55vw; max-width: 500px; max-height: 500px;
+    bottom: -18%; left: -18%;
+    background: radial-gradient(circle, rgba(64,110,220,0.16) 0%, transparent 70%);
+    animation: driftB 28s var(--ease) infinite alternate;
+  }
 
   /* ── App shell ───────────────────────────────────────────── */
   body {
-    background: #0f0f0f;
-    font-family: 'DM Sans', sans-serif;
-    color: #f0f0f0;
+    background: linear-gradient(180deg, var(--bg-base) 0%, var(--bg-deep) 100%);
+    background-attachment: fixed;
+    font-family: 'Inter', sans-serif;
+    color: var(--white);
     padding: 0;
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -33,26 +71,38 @@
   }
 
   #app {
+    position: relative;
+    z-index: 1;
     max-width: 520px;
     margin: 0 auto;
     padding: 12px 12px 40px;
   }
 
+  .lc-icon { width: 15px; height: 15px; flex-shrink: 0; vertical-align: -2px; }
+
   /* ── Header ──────────────────────────────────────────────── */
   .app-header {
-    background: linear-gradient(135deg, #FF5722, #FF8A50);
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-radius: 16px;
-    padding: 18px 20px 16px;
+    padding: 20px 20px 18px;
     margin-bottom: 14px;
     text-align: center;
+    position: relative;
+    overflow: hidden;
   }
-  .app-header-logo {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 10px;
+  .app-header::before {
+    content: '';
+    position: absolute; top: -60%; left: 50%; transform: translateX(-50%);
+    width: 220px; height: 160px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
   }
+  .app-header-logo { position: relative; display: flex; justify-content: center; margin-bottom: 12px; }
   .app-header-logo img {
-    height: 44px;
+    height: 40px;
     width: auto;
     background: rgba(255,255,255,0.92);
     padding: 6px 14px;
@@ -60,71 +110,86 @@
     object-fit: contain;
   }
   .app-header h1 {
+    position: relative;
     font-size: 17px;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 2px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    margin-bottom: 4px;
   }
   .app-header p {
-    font-size: 11px;
-    color: rgba(255,255,255,0.85);
-    letter-spacing: 0.5px;
+    position: relative;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--medium-gray);
+    letter-spacing: 1.5px;
   }
 
   /* ── Cards ───────────────────────────────────────────────── */
   .lc-card {
-    background: #1a1a1a;
-    border-radius: 14px;
+    background: var(--surface);
+    border-radius: 16px;
     padding: 16px;
-    border: 1px solid #2a2a2a;
+    border: 1px solid var(--hairline);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     margin-bottom: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    transition: transform .4s var(--ease), border-color .4s var(--ease), box-shadow .4s var(--ease);
+  }
+  .lc-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(255,87,34,0.35);
+    box-shadow: 0 20px 40px -16px var(--accent-glow);
   }
   .lc-section-label {
+    font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: #FF5722;
+    color: var(--primary-orange);
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     margin-bottom: 12px;
   }
 
   /* ── Tags ────────────────────────────────────────────────── */
   .lc-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-  .lc-tag { font-size: 10px; padding: 3px 9px; border-radius: 16px; font-weight: 600; }
-  .lc-tag-green  { background: rgba(74,138,74,0.2);  color: #6ab86a; border: 1px solid rgba(74,138,74,0.3); }
-  .lc-tag-blue   { background: rgba(74,100,180,0.2); color: #7baae8; border: 1px solid rgba(74,100,180,0.3); }
-  .lc-tag-yellow { background: rgba(180,160,60,0.2); color: #d4be6a; border: 1px solid rgba(180,160,60,0.3); }
-  .lc-tag-purple { background: rgba(140,74,180,0.2); color: #b87ae8; border: 1px solid rgba(140,74,180,0.3); }
+  .lc-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 3px 9px; border-radius: 16px; font-weight: 500; }
+  .lc-tag-green  { background: rgba(74,180,120,0.12);  color: #6fd19a; border: 1px solid rgba(74,180,120,0.28); }
+  .lc-tag-blue   { background: rgba(90,140,220,0.12); color: #8ab2ec; border: 1px solid rgba(90,140,220,0.28); }
+  .lc-tag-yellow { background: rgba(220,180,70,0.12); color: #e0c675; border: 1px solid rgba(220,180,70,0.28); }
+  .lc-tag-purple { background: rgba(180,120,220,0.12); color: #c493ec; border: 1px solid rgba(180,120,220,0.28); }
 
   /* ── Select ──────────────────────────────────────────────── */
   .lc-select {
     width: 100%;
     padding: 11px 36px 11px 13px;
     border-radius: 10px;
-    border: 1px solid #333;
-    background: #111 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23FF5722' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 12px center;
+    border: 1px solid var(--hairline);
+    background: rgba(255,255,255,0.03) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23FF5722' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 12px center;
     font-size: 14px;
-    font-family: 'DM Sans', sans-serif;
-    color: #f0f0f0;
+    font-family: 'Inter', sans-serif;
+    color: var(--white);
     font-weight: 500;
     cursor: pointer;
     outline: none;
     appearance: none;
     -webkit-appearance: none;
+    transition: border-color .3s var(--ease);
   }
+  .lc-select:focus { border-color: rgba(255,87,34,0.45); }
   .lc-select-sm {
     padding: 9px 28px 9px 10px;
     border-radius: 8px;
-    border: 1px solid #333;
-    background: #111 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23FF5722' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 8px center;
+    border: 1px solid var(--hairline);
+    background: rgba(255,255,255,0.03) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23FF5722' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 8px center;
     font-size: 13px;
-    font-family: 'DM Mono', monospace;
+    font-family: 'JetBrains Mono', monospace;
     font-weight: 500;
-    color: #f0f0f0;
+    color: var(--white);
     outline: none;
     appearance: none;
     -webkit-appearance: none;
@@ -137,14 +202,14 @@
 
   /* ── Stepper ─────────────────────────────────────────────── */
   .lc-stepper-group { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-  .lc-stepper-label { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #666; }
+  .lc-stepper-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--medium-gray); }
   .lc-stepper {
     display: flex;
     align-items: center;
-    background: #111;
+    background: rgba(255,255,255,0.03);
     border-radius: 10px;
     overflow: hidden;
-    border: 1px solid #333;
+    border: 1px solid var(--hairline);
   }
   .lc-stepper button {
     width: 40px; height: 42px;
@@ -152,11 +217,11 @@
     background: transparent;
     font-size: 20px;
     cursor: pointer;
-    color: #FF5722;
+    color: var(--primary-orange);
     font-weight: 300;
     line-height: 1;
     -webkit-tap-highlight-color: transparent;
-    transition: background 0.15s;
+    transition: background .2s var(--ease);
   }
   .lc-stepper button:hover  { background: rgba(255,87,34,0.1); }
   .lc-stepper button:active { background: rgba(255,87,34,0.2); }
@@ -166,13 +231,13 @@
     border: none;
     background: transparent;
     font-size: 16px;
-    font-family: 'DM Mono', monospace;
+    font-family: 'JetBrains Mono', monospace;
     font-weight: 500;
-    color: #f0f0f0;
+    color: var(--white);
     outline: none;
     min-width: 0;
   }
-  .lc-stepper-unit { font-size: 12px; color: #555; margin-right: 6px; font-family: 'DM Mono', monospace; }
+  .lc-stepper-unit { font-size: 12px; color: var(--medium-gray); margin-right: 6px; font-family: 'JetBrains Mono', monospace; }
 
   /* ── Toggle ──────────────────────────────────────────────── */
   .lc-toggle {
@@ -181,26 +246,26 @@
     align-items: center;
     justify-content: space-between;
     padding: 11px 14px;
-    background: #111;
+    background: rgba(255,255,255,0.03);
     border-radius: 10px;
     cursor: pointer;
-    border: 1px solid #2a2a2a;
+    border: 1px solid var(--hairline);
     user-select: none;
     -webkit-tap-highlight-color: transparent;
   }
-  .lc-toggle-label { font-size: 13px; font-weight: 500; color: #ccc; }
-  .lc-toggle-track { width: 40px; height: 22px; border-radius: 11px; transition: background .2s; position: relative; flex-shrink: 0; }
-  .lc-toggle-thumb { width: 18px; height: 18px; border-radius: 9px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.4); transition: transform .2s; position: absolute; top: 2px; }
+  .lc-toggle-label { font-size: 13px; font-weight: 500; color: var(--light-gray); display: flex; align-items: center; gap: 6px; }
+  .lc-toggle-track { width: 40px; height: 22px; border-radius: 11px; transition: background .3s var(--ease); position: relative; flex-shrink: 0; }
+  .lc-toggle-thumb { width: 18px; height: 18px; border-radius: 9px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.4); transition: transform .3s var(--ease); position: absolute; top: 2px; }
 
   /* ── Tabs ────────────────────────────────────────────────── */
   .lc-tabs {
     display: flex;
     gap: 3px;
     margin-bottom: 12px;
-    background: #111;
+    background: var(--surface);
     border-radius: 12px;
     padding: 3px;
-    border: 1px solid #2a2a2a;
+    border: 1px solid var(--hairline);
   }
   .lc-tab {
     flex: 1;
@@ -211,38 +276,40 @@
     cursor: pointer;
     font-size: 10px;
     font-weight: 700;
-    font-family: 'DM Sans', sans-serif;
-    color: #555;
-    transition: all .2s;
+    font-family: 'Inter', sans-serif;
+    color: var(--medium-gray);
+    transition: all .3s var(--ease);
     text-align: center;
     -webkit-tap-highlight-color: transparent;
     letter-spacing: 0.3px;
   }
-  .lc-tab.active { background: #FF5722; color: #fff; box-shadow: 0 2px 8px rgba(255,87,34,0.35); }
-  .lc-tab-icon { display: block; font-size: 14px; margin-bottom: 2px; }
+  .lc-tab.active { background: var(--primary-orange); color: #fff; box-shadow: 0 0 20px var(--accent-glow); }
+  .lc-tab-icon { display: flex; justify-content: center; margin-bottom: 3px; }
+  .lc-tab-icon .lc-icon { width: 15px; height: 15px; }
 
   /* ── Stat cards ──────────────────────────────────────────── */
   .lc-stat { border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 3px; }
-  .lc-stat-default { background: #111; border: 1px solid #2a2a2a; }
-  .lc-stat-accent  { background: linear-gradient(135deg, #FF5722, #cc3a10); box-shadow: 0 4px 16px rgba(255,87,34,0.25); }
-  .lc-stat-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-  .lc-stat-label-default { color: #555; }
-  .lc-stat-label-accent  { color: rgba(255,255,255,0.75); }
+  .lc-stat-default { background: var(--surface); border: 1px solid var(--hairline); }
+  .lc-stat-accent  { background: linear-gradient(135deg, var(--primary-orange), #b8420f); box-shadow: 0 4px 20px var(--accent-glow); }
+  .lc-stat-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
+  .lc-stat-label-default { color: var(--medium-gray); }
+  .lc-stat-label-accent  { color: rgba(255,255,255,0.8); }
   .lc-stat-value { display: flex; align-items: baseline; gap: 4px; }
-  .lc-stat-num { font-size: 22px; font-family: 'DM Mono', monospace; font-weight: 500; line-height: 1.1; }
-  .lc-stat-num-default { color: #f0f0f0; }
+  .lc-stat-num { font-size: 22px; font-family: 'JetBrains Mono', monospace; font-weight: 600; line-height: 1.1; }
+  .lc-stat-num-default { color: var(--white); }
   .lc-stat-num-accent  { color: #fff; }
-  .lc-stat-unit { font-size: 12px; font-family: 'DM Mono', monospace; }
-  .lc-stat-unit-default { color: #555; }
+  .lc-stat-unit { font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+  .lc-stat-unit-default { color: var(--medium-gray); }
   .lc-stat-unit-accent  { color: rgba(255,255,255,0.7); }
-  .lc-stat-sub { font-size: 11px; font-family: 'DM Sans', sans-serif; }
-  .lc-stat-sub-default { color: #444; }
-  .lc-stat-sub-accent  { color: rgba(255,255,255,0.6); }
+  .lc-stat-sub { font-size: 11px; font-family: 'Inter', sans-serif; }
+  .lc-stat-sub-default { color: var(--medium-gray); opacity: .8; }
+  .lc-stat-sub-accent  { color: rgba(255,255,255,0.65); }
 
   /* ── Warning ─────────────────────────────────────────────── */
   .lc-warning {
-    background: linear-gradient(135deg, #8a4a2d, #6a3a1a);
-    color: #fff;
+    background: linear-gradient(135deg, rgba(255,87,34,0.16), rgba(255,87,34,0.06));
+    border: 1px solid rgba(255,87,34,0.3);
+    color: var(--white);
     padding: 14px 16px;
     border-radius: 12px;
     margin-bottom: 12px;
@@ -250,42 +317,61 @@
     align-items: flex-start;
     gap: 10px;
   }
-  .lc-warning strong { display: block; margin-bottom: 2px; font-size: 14px; }
-  .lc-warning-text  { font-size: 12px; opacity: .9; line-height: 1.4; }
+  .lc-warning .lc-icon { width: 20px; height: 20px; color: var(--accent-secondary); margin-top: 1px; }
+  .lc-warning strong { display: block; margin-bottom: 2px; font-size: 14px; font-weight: 700; }
+  .lc-warning-text  { font-size: 12px; opacity: .85; line-height: 1.4; }
+
+  /* ── Disclaimer legal ────────────────────────────────────── */
+  .lc-disclaimer {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    color: var(--light-gray);
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin: 4px 0 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .lc-disclaimer .lc-icon { width: 18px; height: 18px; color: var(--primary-orange); margin-top: 1px; flex-shrink: 0; }
+  .lc-disclaimer strong { display: block; margin-bottom: 3px; font-size: 12px; font-weight: 700; color: var(--white); text-transform: uppercase; letter-spacing: .5px; }
+  .lc-disclaimer p { font-size: 11.5px; line-height: 1.5; color: var(--light-gray); }
 
   /* ── Power bar ───────────────────────────────────────────── */
   .lc-powerbar { display: flex; flex-direction: column; gap: 5px; }
-  .lc-powerbar-header { display: flex; justify-content: space-between; font-size: 10px; color: #555; }
-  .lc-powerbar-track  { height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
-  .lc-powerbar-fill   { height: 100%; border-radius: 3px; transition: width .5s ease; }
+  .lc-powerbar-header { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--medium-gray); }
+  .lc-powerbar-track  { height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+  .lc-powerbar-fill   { height: 100%; border-radius: 3px; transition: width .6s var(--ease); }
 
   /* ── Material list ───────────────────────────────────────── */
-  .lc-material-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; background: #111; border-radius: 8px; border: 1px solid #222; }
-  .lc-material-label { font-size: 13px; display: flex; align-items: center; gap: 6px; color: #ccc; }
-  .lc-material-qty   { font-family: 'DM Mono', monospace; font-weight: 600; font-size: 15px; color: #FF5722; }
+  .lc-material-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid var(--hairline); }
+  .lc-material-label { font-size: 13px; display: flex; align-items: center; gap: 8px; color: var(--light-gray); }
+  .lc-material-label .lc-icon { color: var(--primary-orange); }
+  .lc-material-qty   { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 15px; color: var(--primary-orange); }
 
   /* ── Note ────────────────────────────────────────────────── */
-  .lc-note { background: #111; border-radius: 10px; padding: 12px; border: 1px solid #2a2a2a; font-size: 11px; color: #555; line-height: 1.5; }
+  .lc-note { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 12px; border: 1px solid var(--hairline); font-size: 11px; color: var(--medium-gray); line-height: 1.5; display: flex; gap: 8px; align-items: flex-start; }
+  .lc-note .lc-icon { color: var(--primary-orange); margin-top: 1px; flex-shrink: 0; }
 
   /* ── Mini stats ──────────────────────────────────────────── */
-  .lc-mini-stat { text-align: center; padding: 10px; background: #111; border-radius: 8px; border: 1px solid #222; }
-  .lc-mini-stat-val   { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 600; color: #FF5722; }
-  .lc-mini-stat-label { font-size: 9px; color: #555; font-weight: 700; letter-spacing: 1px; margin-top: 2px; }
+  .lc-mini-stat { text-align: center; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid var(--hairline); }
+  .lc-mini-stat-val   { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600; color: var(--primary-orange); }
+  .lc-mini-stat-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--medium-gray); font-weight: 700; letter-spacing: 1px; margin-top: 2px; }
 
   /* ── Field label ─────────────────────────────────────────── */
   .lc-field-col   { display: flex; flex-direction: column; gap: 4px; }
-  .lc-field-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #555; }
+  .lc-field-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--medium-gray); }
 
-  /* ── Print button ────────────────────────────────────────── */
+  /* ── Buttons ─────────────────────────────────────────────── */
   .lc-btn-print {
-    background: linear-gradient(135deg, #FF5722, #cc3a10);
+    background: var(--primary-orange);
     color: #fff;
     border: none;
     border-radius: 12px;
     padding: 14px;
     font-size: 14px;
     font-weight: 700;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     cursor: pointer;
     letter-spacing: .5px;
     display: flex;
@@ -295,27 +381,57 @@
     width: 100%;
     margin-top: 10px;
     -webkit-tap-highlight-color: transparent;
-    box-shadow: 0 4px 16px rgba(255,87,34,0.3);
+    box-shadow: 0 0 32px var(--accent-glow);
+    transition: background .3s var(--ease), transform .3s var(--ease), box-shadow .3s var(--ease);
   }
-  .lc-btn-print:hover { opacity: .9; }
+  .lc-btn-print:hover { background: var(--accent-secondary); transform: translateY(-2px); box-shadow: 0 0 40px var(--accent-glow-strong); }
+
+  .lc-btn-whatsapp {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; margin-top: 10px; padding: 14px;
+    background: #25D366; color: #fff; border: none; border-radius: 12px;
+    font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif;
+    cursor: pointer; letter-spacing: .5px; text-decoration: none;
+    box-shadow: 0 4px 20px rgba(37,211,102,0.28);
+    transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+  }
+  .lc-btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 6px 26px rgba(37,211,102,0.4); }
 
   /* ── Tab content ─────────────────────────────────────────── */
   .lc-tab-content { display: none; flex-direction: column; gap: 10px; }
   .lc-tab-content.active { display: flex; }
 
   /* ── Test pattern color btns ─────────────────────────────── */
-  .tp-color-btn { transition: transform .15s; }
+  .tp-color-btn { transition: transform .2s var(--ease); }
   .tp-color-btn:hover  { transform: scale(1.15); }
-  .tp-color-btn.active { border-color: #FF5722 !important; box-shadow: 0 0 0 2px rgba(255,87,34,.4) !important; }
+  .tp-color-btn.active { border-color: var(--primary-orange) !important; box-shadow: 0 0 0 2px rgba(255,87,34,.4) !important; }
 
   /* ── Footer ──────────────────────────────────────────────── */
   .app-footer {
     text-align: center;
     margin-top: 24px;
-    padding: 12px 0;
-    border-top: 1px solid #1f1f1f;
+    padding: 18px 0 6px;
+    border-top: 1px solid var(--hairline);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
   }
-  .app-footer span { font-size: 10px; color: #333; letter-spacing: 1px; }
+  .lc-footer-back {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--white);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color .3s var(--ease);
+  }
+  .lc-footer-back:hover { color: var(--primary-orange); }
+  .lc-footer-legal { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  .lc-footer-legal a { font-size: 10.5px; color: var(--medium-gray); text-decoration: none; transition: color .3s var(--ease); }
+  .lc-footer-legal a:hover { color: var(--light-gray); }
+  .app-footer span { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; color: rgba(255,255,255,0.18); letter-spacing: 1px; }
 
   /* ── PWA banners ─────────────────────────────────────────── */
   #offline-banner {
@@ -330,9 +446,13 @@
     font-size: 0.82rem;
     font-weight: 600;
     z-index: 9999;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
-  #offline-banner.show { display: block; }
+  #offline-banner.show { display: flex; }
+  #update-banner .lc-icon, #offline-banner .lc-icon { width: 15px; height: 15px; }
 
   #install-banner {
     display: none;
@@ -341,22 +461,25 @@
     left: 50%;
     transform: translateX(-50%);
     width: min(400px, calc(100vw - 2rem));
-    background: #1a1a1a;
-    border: 1px solid #FF5722;
+    background: var(--bg-base);
+    border: 1px solid var(--hairline);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-radius: 14px;
     padding: 1rem 1.25rem;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,87,34,0.15);
     z-index: 9998;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
   }
   #install-banner.show { display: block; }
   .ib-row   { display: flex; align-items: center; gap: .75rem; }
-  .ib-icon  { font-size: 1.8rem; flex-shrink: 0; }
-  .ib-text strong { display: block; font-size: .9rem; color: #f0f0f0; }
-  .ib-text span   { font-size: .76rem; color: #555; }
+  .ib-icon  { width: 34px; height: 34px; border-radius: 9px; background: var(--surface); border: 1px solid var(--hairline); display: flex; align-items: center; justify-content: center; color: var(--primary-orange); flex-shrink: 0; }
+  .ib-text strong { display: block; font-size: .9rem; color: var(--white); font-weight: 700; }
+  .ib-text span   { font-size: .76rem; color: var(--medium-gray); }
   .ib-btns  { display: flex; gap: .5rem; margin-top: .7rem; }
-  .ib-install { flex: 1; background: #FF5722; color: white; border: none; border-radius: 8px; padding: .55rem 1rem; font-weight: 700; font-size: .82rem; cursor: pointer; }
-  .ib-dismiss { background: transparent; color: #555; border: 1px solid #333; border-radius: 8px; padding: .55rem 1rem; font-size: .82rem; cursor: pointer; }
+  .ib-install { flex: 1; background: var(--primary-orange); color: white; border: none; border-radius: 8px; padding: .55rem 1rem; font-weight: 700; font-size: .82rem; cursor: pointer; transition: background .3s var(--ease), transform .3s var(--ease); }
+  .ib-install:hover { background: var(--accent-secondary); transform: translateY(-1px); }
+  .ib-dismiss { background: transparent; color: var(--medium-gray); border: 1px solid var(--hairline); border-radius: 8px; padding: .55rem 1rem; font-size: .82rem; cursor: pointer; }
 
   @media print { .no-print { display: none !important; } }
 
@@ -365,20 +488,33 @@
     .lc-stat-num { font-size: 18px; }
     .lc-tab { font-size: 9px; padding: 7px 2px; }
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ambient-glow { animation: none !important; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 </style>
 </head>
 <body>
 
-<div id="offline-banner">⚡ Sin conexión — funciona igual offline</div>
+<div class="ambient-glow ambient-glow-1"></div>
+<div class="ambient-glow ambient-glow-2"></div>
 
-<div id="update-banner" style="display:none;position:fixed;top:env(safe-area-inset-top,0);left:0;right:0;background:#FF5722;color:#fff;padding:0.65rem 1rem;font-size:0.82rem;font-weight:600;z-index:9999;align-items:center;justify-content:space-between;gap:0.75rem;font-family:DM Sans,sans-serif;">
-  <span>🆕 Nueva versión disponible</span>
+<div id="offline-banner"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg> Sin conexión — funciona igual offline</div>
+
+<div id="update-banner" style="display:none;position:fixed;top:env(safe-area-inset-top,0);left:0;right:0;background:#FF5722;color:#fff;padding:0.65rem 1rem;font-size:0.82rem;font-weight:600;z-index:9999;align-items:center;justify-content:space-between;gap:0.75rem;font-family:Inter,sans-serif;">
+  <span style="display:flex;align-items:center;gap:6px"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Nueva versión disponible</span>
   <button onclick="window.location.reload()" style="background:rgba(255,255,255,0.25);border:none;color:#fff;padding:0.3rem 0.9rem;border-radius:6px;font-weight:700;font-size:0.8rem;cursor:pointer;">Actualizar</button>
 </div>
 
 <div id="install-banner">
   <div class="ib-row">
-    <div class="ib-icon">📱</div>
+    <div class="ib-icon"><svg class="lc-icon" style="width:18px;height:18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
     <div class="ib-text">
       <strong>Instalá la app</strong>
       <span>Funciona sin internet como app nativa</span>
@@ -403,7 +539,7 @@
 
   <!-- Modelo de Cabinet -->
   <div class="lc-card">
-    <div class="lc-section-label">🖥️ MODELO DE CABINET</div>
+    <div class="lc-section-label"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> MODELO DE CABINET</div>
     <select id="modelSelect" class="lc-select">
       <option value="manual">Introducir datos manualmente</option>
       <option value="p26_lite_curvo" selected>Módulo P2.6 Lite Curvo</option>
@@ -427,7 +563,7 @@
 
   <!-- Manual -->
   <div id="manualCard" class="lc-card fade-up" style="display:none">
-    <div class="lc-section-label">⚙️ DATOS DEL MÓDULO</div>
+    <div class="lc-section-label"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg> DATOS DEL MÓDULO</div>
     <div class="lc-grid-2">
       <div class="lc-stepper-group"><span class="lc-stepper-label">Ancho módulo</span><div class="lc-stepper"><button type="button" data-target="manTileW" data-delta="-0.1">−</button><input type="number" id="manTileW" value="0.5" step="0.1"><span class="lc-stepper-unit">m</span><button type="button" data-target="manTileW" data-delta="0.1">+</button></div></div>
       <div class="lc-stepper-group"><span class="lc-stepper-label">Alto módulo</span><div class="lc-stepper"><button type="button" data-target="manTileH" data-delta="-0.1">−</button><input type="number" id="manTileH" value="0.5" step="0.1"><span class="lc-stepper-unit">m</span><button type="button" data-target="manTileH" data-delta="0.1">+</button></div></div>
@@ -442,7 +578,7 @@
 
   <!-- Dimensiones -->
   <div class="lc-card">
-    <div class="lc-section-label">📐 DIMENSIONES DE PANTALLA</div>
+    <div class="lc-section-label"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 17 3l4 4L7 21z"/><path d="m14 6 2 2M11 9l2 2M8 12l2 2M5 15l2 2"/></svg> DIMENSIONES DE PANTALLA</div>
     <div class="lc-grid-2">
       <div class="lc-stepper-group"><span class="lc-stepper-label">↔ Ancho</span><div class="lc-stepper"><button type="button" data-target="screenW" data-delta="-0.5">−</button><input type="number" id="screenW" value="6" step="0.5"><span class="lc-stepper-unit">m</span><button type="button" data-target="screenW" data-delta="0.5">+</button></div></div>
       <div class="lc-stepper-group"><span class="lc-stepper-label">↕ Alto</span><div class="lc-stepper"><button type="button" data-target="screenH" data-delta="-0.5">−</button><input type="number" id="screenH" value="3" step="0.5"><span class="lc-stepper-unit">m</span><button type="button" data-target="screenH" data-delta="0.5">+</button></div></div>
@@ -451,7 +587,7 @@
 
   <!-- Eléctrica -->
   <div class="lc-card">
-    <div class="lc-section-label">⚡ CONFIGURACIÓN ELÉCTRICA</div>
+    <div class="lc-section-label"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> CONFIGURACIÓN ELÉCTRICA</div>
     <div class="lc-grid-3">
       <div class="lc-field-col"><span class="lc-field-label">TENSIÓN</span><select id="voltage" class="lc-select-sm"><option value="230">230V</option><option value="400">400V</option></select></div>
       <div class="lc-field-col"><span class="lc-field-label">FASE</span><select id="phase" class="lc-select-sm"><option value="mono">Monofásico</option><option value="tri" selected>Trifásico</option></select></div>
@@ -462,54 +598,62 @@
   <!-- Resultados -->
   <div id="resultsContainer">
     <div id="warningBox" class="lc-warning">
-      <span style="font-size:20px">⚠️</span>
+      <svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m10.29 3.86-8.18 14.14A2 2 0 0 0 3.82 21h16.36a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       <div>
         <strong>Altura &gt; 4.5m</strong>
         <span class="lc-warning-text">Se desaconseja montaje con mecanotubo (truss/tubo/grapa). Emplear estructura de Layher para asegurar la pantalla y a los operarios en trabajo en altura.</span>
       </div>
     </div>
 
+    <div class="lc-disclaimer">
+      <svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+      <div>
+        <strong>Cálculo orientativo</strong>
+        <p>Los valores de pitch, resolución, módulos, peso y consumo eléctrico son estimaciones orientativas. La configuración final debe ser validada por personal técnico competente antes de cualquier instalación real.</p>
+      </div>
+    </div>
+
     <div class="lc-tabs no-print" id="tabBar">
-      <button class="lc-tab active" data-tab="general"><span class="lc-tab-icon">📊</span>General</button>
-      <button class="lc-tab" data-tab="electrica"><span class="lc-tab-icon">⚡</span>Eléctrica</button>
-      <button class="lc-tab" data-tab="estructura"><span class="lc-tab-icon">🏗️</span>Estructura</button>
-      <button class="lc-tab" data-tab="preview"><span class="lc-tab-icon">👁️</span>Vista</button>
-      <button class="lc-tab" data-tab="testpattern"><span class="lc-tab-icon">🎯</span>Test</button>
+      <button class="lc-tab active" data-tab="general"><span class="lc-tab-icon"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span>General</button>
+      <button class="lc-tab" data-tab="electrica"><span class="lc-tab-icon"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>Eléctrica</button>
+      <button class="lc-tab" data-tab="estructura"><span class="lc-tab-icon"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></span>Estructura</button>
+      <button class="lc-tab" data-tab="preview"><span class="lc-tab-icon"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>Vista</button>
+      <button class="lc-tab" data-tab="testpattern"><span class="lc-tab-icon"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg></span>Test</button>
     </div>
 
     <!-- General -->
     <div id="tab-general" class="lc-tab-content active">
       <div class="lc-grid-2">
         <div class="lc-stat lc-stat-accent">
-          <span class="lc-stat-label lc-stat-label-accent">📐 Dimensiones reales</span>
+          <span class="lc-stat-label lc-stat-label-accent"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 17 3l4 4L7 21z"/><path d="m14 6 2 2M11 9l2 2M8 12l2 2M5 15l2 2"/></svg> Dimensiones reales</span>
           <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-accent" id="r-dims"></span><span class="lc-stat-unit lc-stat-unit-accent">m</span></div>
           <span class="lc-stat-sub lc-stat-sub-accent" id="r-tiles-info"></span>
         </div>
         <div class="lc-stat lc-stat-default">
-          <span class="lc-stat-label lc-stat-label-default">🖥️ Resolución total</span>
+          <span class="lc-stat-label lc-stat-label-default"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Resolución total</span>
           <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-res"></span><span class="lc-stat-unit lc-stat-unit-default">px</span></div>
           <span class="lc-stat-sub lc-stat-sub-default" id="r-mpx"></span>
         </div>
       </div>
       <div class="lc-grid-2">
         <div class="lc-stat lc-stat-default">
-          <span class="lc-stat-label lc-stat-label-default">⚓ Peso total</span>
+          <span class="lc-stat-label lc-stat-label-default"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><line x1="12" y1="7" x2="12" y2="21"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg> Peso total</span>
           <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-weight"></span><span class="lc-stat-unit lc-stat-unit-default">kg</span></div>
           <span class="lc-stat-sub lc-stat-sub-default" id="r-weight-detail"></span>
         </div>
         <div class="lc-stat lc-stat-default">
-          <span class="lc-stat-label lc-stat-label-default">📏 Superficie</span>
+          <span class="lc-stat-label lc-stat-label-default"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg> Superficie</span>
           <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-area"></span><span class="lc-stat-unit lc-stat-unit-default">m²</span></div>
           <span class="lc-stat-sub lc-stat-sub-default" id="r-diagonal"></span>
         </div>
       </div>
       <div class="lc-grid-2">
         <div class="lc-stat lc-stat-default">
-          <span class="lc-stat-label lc-stat-label-default">↔ Relación aspecto</span>
+          <span class="lc-stat-label lc-stat-label-default"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 8 22 12 18 16"/><polyline points="6 8 2 12 6 16"/><line x1="2" y1="12" x2="22" y2="12"/></svg> Relación aspecto</span>
           <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-ratio"></span><span class="lc-stat-unit lc-stat-unit-default">:1</span></div>
         </div>
         <div class="lc-stat lc-stat-default">
-          <span class="lc-stat-label lc-stat-label-default">👁️ Dist. mín. visionado</span>
+          <span class="lc-stat-label lc-stat-label-default"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Dist. mín. visionado</span>
           <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-mindist"></span><span class="lc-stat-unit lc-stat-unit-default">m</span></div>
           <span class="lc-stat-sub lc-stat-sub-default" id="r-pitch"></span>
         </div>
@@ -520,12 +664,12 @@
     <div id="tab-electrica" class="lc-tab-content">
       <div class="lc-grid-2">
         <div class="lc-stat lc-stat-accent">
-          <span class="lc-stat-label lc-stat-label-accent">⚡ Consumo máximo</span>
+          <span class="lc-stat-label lc-stat-label-accent"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Consumo máximo</span>
           <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-accent" id="r-maxpower"></span><span class="lc-stat-unit lc-stat-unit-accent">W</span></div>
           <span class="lc-stat-sub lc-stat-sub-accent" id="r-maxkw"></span>
         </div>
         <div class="lc-stat lc-stat-default">
-          <span class="lc-stat-label lc-stat-label-default">⚡ Consumo medio</span>
+          <span class="lc-stat-label lc-stat-label-default"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Consumo medio</span>
           <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-avgpower"></span><span class="lc-stat-unit lc-stat-unit-default">W</span></div>
           <span class="lc-stat-sub lc-stat-sub-default" id="r-avgkw"></span>
         </div>
@@ -538,37 +682,37 @@
       </div>
       <div class="lc-grid-2">
         <div class="lc-stat lc-stat-default">
-          <span class="lc-stat-label lc-stat-label-default">🔌 Circuitos (MÁX)</span>
+          <span class="lc-stat-label lc-stat-label-default"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg> Circuitos (MÁX)</span>
           <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-circuits-max"></span><span class="lc-stat-unit lc-stat-unit-default" id="r-circuits-max-unit"></span></div>
           <span class="lc-stat-sub lc-stat-sub-default" id="r-circuits-max-sub"></span>
         </div>
         <div class="lc-stat lc-stat-default">
-          <span class="lc-stat-label lc-stat-label-default">🔌 Circuitos (MED)</span>
+          <span class="lc-stat-label lc-stat-label-default"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg> Circuitos (MED)</span>
           <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="r-circuits-avg"></span><span class="lc-stat-unit lc-stat-unit-default" id="r-circuits-avg-unit"></span></div>
           <span class="lc-stat-sub lc-stat-sub-default">Con factor de carga 80%</span>
         </div>
       </div>
-      <div class="lc-note">💡 <strong>Nota:</strong> Factor de carga del 80% sobre capacidad nominal. Consumo medio según especificaciones del fabricante para contenido mixto.</div>
+      <div class="lc-note"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12.01" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg><span><strong>Nota:</strong> Factor de carga del 80% sobre capacidad nominal. Consumo medio según especificaciones del fabricante para contenido mixto.</span></div>
     </div>
 
     <!-- Estructura -->
     <div id="tab-estructura" class="lc-tab-content">
       <div class="lc-toggle" id="bumperToggle" style="margin-top:0;margin-bottom:10px">
-        <span class="lc-toggle-label">⚓ Incluir Bumpers en peso</span>
+        <span class="lc-toggle-label"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><line x1="12" y1="7" x2="12" y2="21"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg> Incluir Bumpers en peso</span>
         <div class="lc-toggle-track" id="bumperTrack" style="background:#FF5722">
           <div class="lc-toggle-thumb" id="bumperThumb" style="transform:translateX(18px)"></div>
         </div>
       </div>
       <div class="lc-stat lc-stat-accent">
-        <span class="lc-stat-label lc-stat-label-accent">⚓ Contrapeso total</span>
+        <span class="lc-stat-label lc-stat-label-accent"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><line x1="12" y1="7" x2="12" y2="21"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg> Contrapeso total</span>
         <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-accent" id="r-counterweight"></span><span class="lc-stat-unit lc-stat-unit-accent">kg</span></div>
         <span class="lc-stat-sub lc-stat-sub-accent" id="r-cw-detail"></span>
       </div>
       <div class="lc-card" style="margin-bottom:0">
-        <div class="lc-section-label">🏗️ MATERIAL NECESARIO</div>
+        <div class="lc-section-label"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg> MATERIAL NECESARIO</div>
         <div id="materialList" style="display:flex;flex-direction:column;gap:8px"></div>
       </div>
-      <div class="lc-note">💡 <strong>Nota:</strong> Contrapesos para estructura de mecanotubo con ground support. Puntos cada 1.5m a lo largo del ancho.</div>
+      <div class="lc-note"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12.01" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg><span><strong>Nota:</strong> Contrapesos para estructura de mecanotubo con ground support. Puntos cada 1.5m a lo largo del ancho.</span></div>
     </div>
 
     <!-- Preview -->
@@ -586,12 +730,12 @@
     <!-- Test Pattern -->
     <div id="tab-testpattern" class="lc-tab-content">
       <div class="lc-card">
-        <div class="lc-section-label">🎯 TEST PATTERN GENERATOR</div>
+        <div class="lc-section-label"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg> TEST PATTERN GENERATOR</div>
         <div style="display:flex;flex-direction:column;gap:10px">
           <div class="lc-grid-2">
             <div class="lc-stepper-group">
               <span class="lc-stepper-label">Nombre</span>
-              <input type="text" id="tpName" value="TLO Visual" style="padding:10px 12px;border-radius:10px;border:1px solid #333;background:#111;font-size:13px;font-family:'DM Sans',sans-serif;color:#f0f0f0;outline:none;width:100%">
+              <input type="text" id="tpName" value="TLO Visual" style="padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-size:13px;font-family:'Inter',sans-serif;color:#EDEDEF;outline:none;width:100%">
             </div>
             <div class="lc-stepper-group">
               <span class="lc-stepper-label">Color Grid</span>
@@ -624,24 +768,35 @@
         <canvas id="tpCanvas" style="width:100%;height:280px;border-radius:8px;display:block"></canvas>
       </div>
       <div class="lc-stat lc-stat-default" style="margin-top:10px">
-        <span class="lc-stat-label lc-stat-label-default">📐 Resolución del test pattern</span>
+        <span class="lc-stat-label lc-stat-label-default"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 17 3l4 4L7 21z"/><path d="m14 6 2 2M11 9l2 2M8 12l2 2M5 15l2 2"/></svg> Resolución del test pattern</span>
         <div class="lc-stat-value"><span class="lc-stat-num lc-stat-num-default" id="tp-res-info"></span><span class="lc-stat-unit lc-stat-unit-default">px</span></div>
       </div>
-      <button type="button" id="tpDownloadBtn" style="width:100%;padding:14px;background:linear-gradient(135deg,#FF5722,#cc3a10);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;margin-top:10px;letter-spacing:0.5px;box-shadow:0 4px 16px rgba(255,87,34,0.3)">
-        ⬇️ Descargar Test Pattern (PNG resolución real)
+      <button type="button" id="tpDownloadBtn" class="lc-btn-print" style="margin-top:10px">
+        <svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><line x1="4" y1="21" x2="20" y2="21"/></svg> Descargar Test Pattern (PNG resolución real)
       </button>
-      <div class="lc-note" style="margin-top:10px">💡 <strong>Nota:</strong> El pattern se genera a la resolución real de la pantalla. Para pantallas muy grandes (&gt;8K), la descarga puede tardar unos segundos.</div>
+      <div class="lc-note" style="margin-top:10px"><svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12.01" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg><span><strong>Nota:</strong> El pattern se genera a la resolución real de la pantalla. Para pantallas muy grandes (&gt;8K), la descarga puede tardar unos segundos.</span></div>
     </div>
   </div>
 
-  <button type="button" class="lc-btn-print no-print" onclick="window._printLedReport()">🖨️ Imprimir Informe</button>
+  <button type="button" class="lc-btn-print no-print" onclick="window._printLedReport()">
+    <svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Imprimir Informe
+  </button>
 
-  <a href="https://wa.me/34686514064" target="_blank" rel="noopener" class="no-print" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:10px;padding:14px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:.5px;text-decoration:none;box-shadow:0 4px 16px rgba(37,211,102,0.3);">
+  <a href="https://wa.me/34686514064" target="_blank" rel="noopener" class="no-print lc-btn-whatsapp">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
     Consultar por WhatsApp
   </a>
 
-  <div class="app-footer">
+  <div class="app-footer no-print">
+    <a class="lc-footer-back" href="https://tlovisual.com">
+      <svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Volver a TLO Visual
+    </a>
+    <div class="lc-footer-legal">
+      <a href="https://tlovisual.com/aviso-legal.html" target="_blank" rel="noopener">Aviso Legal</a>
+      <a href="https://tlovisual.com/privacidad.html" target="_blank" rel="noopener">Política de Privacidad</a>
+      <a href="https://tlovisual.com/cookies.html" target="_blank" rel="noopener">Política de Cookies</a>
+    </div>
     <span>TLO VISUAL © 2026 — CALCULADORA TÉCNICA LED</span>
   </div>
 </div>
@@ -692,7 +847,7 @@
 
   el('bumperToggle').addEventListener('click', function() {
     useBumpers = !useBumpers;
-    el('bumperTrack').style.background = useBumpers ? '#FF5722' : '#333';
+    el('bumperTrack').style.background = useBumpers ? '#FF5722' : 'rgba(255,255,255,0.12)';
     el('bumperThumb').style.transform  = useBumpers ? 'translateX(18px)' : 'translateX(0)';
     recalc();
   });
@@ -824,14 +979,19 @@
     el('r-counterweight').textContent = fnum(cw, 0);
     el('r-cw-detail').textContent     = cwPoints + ' bases · ' + cwPerPoint + ' kg/base (' + cwPlates14 + ' planchas 14kg c/u)';
 
+    var ICON_BOX = '<svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>';
+    var ICON_RULER = '<svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 17 3l4 4L7 21z"/><path d="m14 6 2 2M11 9l2 2M8 12l2 2M5 15l2 2"/></svg>';
+    var ICON_WRENCH = '<svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94Z"/></svg>';
+    var ICON_LINK = '<svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
+    var ICON_CLIP = '<svg class="lc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>';
     var materials = [
-      { icon:'🧱', label:'Planchas contrapeso 14kg',  qty: cwPoints * cwPlates14 },
-      tr2  > 0 ? { icon:'📏', label:'Truss vertical 2m',   qty: tr2  * cwPoints } : null,
-      tr15 > 0 ? { icon:'📏', label:'Truss vertical 1.5m', qty: tr15 * cwPoints } : null,
-      tr1  > 0 ? { icon:'📏', label:'Truss vertical 1m',   qty: tr1  * cwPoints } : null,
-      { icon:'🔧', label:'Tubos horizontales (2m)',   qty: tubes },
-      { icon:'🔩', label:'Grapas dobles',              qty: clamps },
-      { icon:'🦋', label:'Mariposas + grapa',          qty: butterflies }
+      { icon: ICON_BOX, label:'Planchas contrapeso 14kg',  qty: cwPoints * cwPlates14 },
+      tr2  > 0 ? { icon: ICON_RULER, label:'Truss vertical 2m',   qty: tr2  * cwPoints } : null,
+      tr15 > 0 ? { icon: ICON_RULER, label:'Truss vertical 1.5m', qty: tr15 * cwPoints } : null,
+      tr1  > 0 ? { icon: ICON_RULER, label:'Truss vertical 1m',   qty: tr1  * cwPoints } : null,
+      { icon: ICON_WRENCH, label:'Tubos horizontales (2m)',   qty: tubes },
+      { icon: ICON_LINK, label:'Grapas dobles',              qty: clamps },
+      { icon: ICON_CLIP, label:'Mariposas + grapa',          qty: butterflies }
     ].filter(Boolean);
     el('materialList').innerHTML = materials.map(function(m) {
       return '<div class="lc-material-row"><span class="lc-material-label"><span>' + m.icon + '</span> ' + m.label + '</span><span class="lc-material-qty">' + m.qty + '</span></div>';
@@ -855,13 +1015,13 @@
     ctx.scale(dpr, dpr);
     var w = rect.width, h = rect.height;
     ctx.clearRect(0,0,w,h);
-    ctx.fillStyle = '#111'; ctx.fillRect(0,0,w,h);
+    ctx.fillStyle = '#0a0a0f'; ctx.fillRect(0,0,w,h);
     var pad = 44;
     var scale = Math.min((w - pad*2) / d.realW, (h - pad*2) / d.realH);
     var rW = d.realW * scale, rH = d.realH * scale;
     var sX = (w - rW) / 2, sY = (h - rH) / 2;
     ctx.shadowColor = 'rgba(255,87,34,0.2)'; ctx.shadowBlur = 20; ctx.shadowOffsetY = 6;
-    ctx.fillStyle = '#1a1a1a'; ctx.fillRect(sX, sY, rW, rH);
+    ctx.fillStyle = '#121218'; ctx.fillRect(sX, sY, rW, rH);
     ctx.shadowColor = 'transparent';
     for (var i = 0; i < d.tilesH; i++) {
       for (var j = 0; j < d.tilesV; j++) {
@@ -883,11 +1043,11 @@
     ctx.beginPath(); ctx.moveTo(dimX-4, sY); ctx.lineTo(dimX+4, sY); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(dimX-4, sY+rH); ctx.lineTo(dimX+4, sY+rH); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = '#FF5722'; ctx.font = '500 12px DM Mono, monospace'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#FF5722'; ctx.font = '500 12px JetBrains Mono, monospace'; ctx.textAlign = 'center';
     ctx.fillText(d.realW.toFixed(1) + 'm', sX + rW/2, dimY+15);
     ctx.save(); ctx.translate(dimX-12, sY+rH/2); ctx.rotate(-Math.PI/2);
     ctx.fillText(d.realH.toFixed(1) + 'm', 0, 0); ctx.restore();
-    ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.font = '500 10px DM Mono, monospace'; ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.font = '500 10px JetBrains Mono, monospace'; ctx.textAlign = 'center';
     ctx.fillText(d.tilesH + ' × ' + d.tilesV + ' módulos', sX+rW/2, sY+rH/2+4);
   }
 
@@ -906,7 +1066,7 @@
   function setupTpToggle(toggleId, trackId, thumbId, getter, setter) {
     el(toggleId).addEventListener('click', function() {
       var v = !getter(); setter(v);
-      el(trackId).style.background = v ? '#FF5722' : '#333';
+      el(trackId).style.background = v ? '#FF5722' : 'rgba(255,255,255,0.12)';
       el(thumbId).style.transform = v ? 'translateX(16px)' : 'translateX(0)';
       drawTestPatternPreview();
     });
@@ -941,7 +1101,7 @@
         var px=corners[c][0], py=corners[c][1];
         ctx.beginPath(); ctx.moveTo(px-crossSize,py); ctx.lineTo(px+crossSize,py); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(px,py-crossSize); ctx.lineTo(px,py+crossSize); ctx.stroke();
-        ctx.fillStyle='#fff'; ctx.font='bold '+fontSize+'px DM Mono,monospace';
+        ctx.fillStyle='#fff'; ctx.font='bold '+fontSize+'px JetBrains Mono,monospace';
         ctx.textAlign = c%2===0?'left':'right'; ctx.textBaseline = c<2?'top':'bottom';
         ctx.fillText(labels[c], px+(c%2===0?crossSize*0.5:-crossSize*0.5), py+(c<2?crossSize*0.5:-crossSize*0.5));
       }
@@ -956,7 +1116,7 @@
       ctx.beginPath(); ctx.arc(cx,cy,isPreview?3:Math.max(4,Math.round(h/100)),0,Math.PI*2); ctx.fill();
     }
     if (tpShowNumbers) {
-      ctx.fillStyle='#fff'; ctx.font=tinyFont+'px DM Mono,monospace'; ctx.globalAlpha=0.6;
+      ctx.fillStyle='#fff'; ctx.font=tinyFont+'px JetBrains Mono,monospace'; ctx.globalAlpha=0.6;
       var margin=isPreview?6:Math.round(h/60);
       ctx.textAlign='center';
       for (var i=0;i<tilesH;i++) { var x=((i+0.5)/tilesH)*w; var num=i-Math.floor(tilesH/2); if(tilesH%2===0&&num>=0)num++; var lbl=(num>0?'+':'')+num; ctx.textBaseline='top'; ctx.fillText(lbl,x,margin); ctx.textBaseline='bottom'; ctx.fillText(lbl,x,h-margin); }
@@ -965,11 +1125,11 @@
       ctx.globalAlpha=1;
     }
     ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.font='bold '+(isPreview?14:Math.round(h/25))+'px DM Sans,sans-serif';
+    ctx.font='bold '+(isPreview?14:Math.round(h/25))+'px Inter,sans-serif';
     ctx.fillText(name, cx, cy-(isPreview?28:h*0.07));
-    ctx.font=(isPreview?11:Math.round(h/35))+'px DM Mono,monospace';
+    ctx.font=(isPreview?11:Math.round(h/35))+'px JetBrains Mono,monospace';
     ctx.fillText(w+'px × '+h+'px', cx, cy+(isPreview?8:h*0.02));
-    ctx.globalAlpha=0.6; ctx.font=(isPreview?9:Math.round(h/45))+'px DM Mono,monospace';
+    ctx.globalAlpha=0.6; ctx.font=(isPreview?9:Math.round(h/45))+'px JetBrains Mono,monospace';
     ctx.fillText((w/h).toFixed(2)+':1', cx, cy+(isPreview?22:h*0.055));
     ctx.fillText(tilesH+' × '+tilesV+' módulos', cx, cy+(isPreview?35:h*0.09));
     ctx.globalAlpha=1;
